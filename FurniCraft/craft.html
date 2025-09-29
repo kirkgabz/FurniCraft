@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FurniCraft - Craft Furniture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      min-height: 100vh;
+      color: #2c3e50;
+      line-height: 1.6;
+    }
+
+    /* Professional Header */
+    header {
+      background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #CD853F 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      box-shadow: 0 4px 20px rgba(139, 69, 19, 0.3);
+      position: relative;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="wood" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="%23A0522D"/><path d="M0,10 Q5,8 10,10 T20,10" stroke="%23D2691E" stroke-width="0.5" fill="none"/><path d="M0,15 Q5,13 10,15 T20,15" stroke="%23CD853F" stroke-width="0.3" fill="none"/></pattern></defs><rect width="100" height="100" fill="url(%23wood)"/></svg>');
+      opacity: 0.1;
+      pointer-events: none;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.8rem;
+    }
+
+    .logo::before {
+      content: '🪑';
+      font-size: 2rem;
+    }
+
+    #user {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Main Content */
+    main {
+      padding: 3rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: #8B4513;
+      margin-bottom: 1rem;
+    }
+
+    .page-header p {
+      font-size: 1.1rem;
+      color: #6c757d;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Furniture Grid */
+    .furniture-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .furniture-card {
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(139, 69, 19, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .furniture-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #8B4513, #CD853F, #A0522D);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+    }
+
+    .furniture-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .furniture-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(139, 69, 19, 0.15), 0 15px 25px rgba(0, 0, 0, 0.1);
+      border-color: rgba(139, 69, 19, 0.2);
+    }
+
+    .furniture-image {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg, #8B4513, #CD853F);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .furniture-card:hover .furniture-image {
+      transform: scale(1.1) rotate(5deg);
+      background: linear-gradient(135deg, #A0522D, #D2691E);
+    }
+
+    .furniture-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    .furniture-card p {
+      color: #6c757d;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .furniture-card .price {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #8B4513;
+      margin-bottom: 1rem;
+    }
+
+    .craft-button {
+      background: linear-gradient(135deg, #8B4513, #CD853F);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 25px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .craft-button:hover {
+      background: linear-gradient(135deg, #A0522D, #D2691E);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 800px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .modal-header h2 {
+      font-family: 'Playfair Display', serif;
+      color: #8B4513;
+      margin: 0;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #6c757d;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+      background: #f8f9fa;
+      color: #8B4513;
+    }
+
+    .material-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .material-card {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .material-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .material-card.selected {
+      border-color: #8B4513;
+      background: linear-gradient(135deg, #8B4513, #CD853F);
+      color: white;
+    }
+
+    .material-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 1rem;
+      background: linear-gradient(135deg, #8B4513, #CD853F);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+    }
+
+    .material-card.selected .material-icon {
+      background: white;
+      color: #8B4513;
+    }
+
+    .material-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .material-card p {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .material-card.selected p {
+      opacity: 1;
+      color: white;
+    }
+
+    .material-card.recommended {
+      border: 2px solid #FFD700;
+      background: linear-gradient(145deg, #FFF8DC, #F5F5DC);
+    }
+
+    .material-card.recommended:hover {
+      border-color: #FFA500;
+      background: linear-gradient(145deg, #FFE4B5, #F0E68C);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 25px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #8B4513, #CD853F);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #A0522D, #D2691E);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+    }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #6c757d;
+      border: 1px solid #dee2e6;
+    }
+
+    .btn-secondary:hover {
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      header {
+        padding: 1rem;
+        font-size: 1.2rem;
+      }
+
+      main {
+        padding: 2rem 1rem;
+      }
+
+      .furniture-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .material-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-content {
+        padding: 1.5rem;
+        margin: 1rem;
+      }
+    }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display: flex; align-items: center;">
+      <button onclick="window.history.back()" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; margin-right: 1rem;">← Back</button>
+      <div class="logo">FurniCraft</div>
+    </div>
+    <span id="user">Welcome!</span>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>Choose Your Furniture</h1>
+      <p>Select the perfect furniture piece to start your crafting journey. Each item can be customized with premium materials and finishes.</p>
+    </div>
+
+    <div class="furniture-grid">
+      <div class="furniture-card fade-in" onclick="openMaterialModal('chair', 'Dining Chair', '🪑')">
+        <div class="furniture-image">🪑</div>
+        <h2>Dining Chair</h2>
+        <p>Comfortable and stylish dining chair perfect for any dining room setup. Ergonomic design with customizable upholstery options.</p>
+        <button class="craft-button">Customize Chair</button>
+      </div>
+
+      <div class="furniture-card fade-in" onclick="openMaterialModal('table', 'Dining Table', '🍽️')">
+        <div class="furniture-image">🍽️</div>
+        <h2>Dining Table</h2>
+        <p>Beautiful dining table that seats 4-6 people. Available in various sizes and can accommodate extensions for larger gatherings.</p>
+        <button class="craft-button">Customize Table</button>
+      </div>
+
+      <div class="furniture-card fade-in" onclick="openMaterialModal('sofa', 'Living Room Sofa', '🛋️')">
+        <div class="furniture-image">🛋️</div>
+        <h2>Living Room Sofa</h2>
+        <p>Comfortable 3-seater sofa perfect for your living room. Deep seating with premium cushioning and multiple fabric options.</p>
+        <button class="craft-button">Customize Sofa</button>
+      </div>
+
+      <div class="furniture-card fade-in" onclick="openMaterialModal('cabinet', 'Storage Cabinet', '🗄️')">
+        <div class="furniture-image">🗄️</div>
+        <h2>Storage Cabinet</h2>
+        <p>Versatile storage cabinet with adjustable shelves. Perfect for bedroom, office, or living room organization needs.</p>
+        <button class="craft-button">Customize Cabinet</button>
+      </div>
+
+      <div class="furniture-card fade-in" onclick="openMaterialModal('bed', 'Queen Bed Frame', '🛏️')">
+        <div class="furniture-image">🛏️</div>
+        <h2>Queen Bed Frame</h2>
+        <p>Sturdy and elegant queen-size bed frame with headboard. Available with storage drawers or simple modern design.</p>
+        <button class="craft-button">Customize Bed</button>
+      </div>
+
+      <div class="furniture-card fade-in" onclick="openMaterialModal('bookshelf', 'Bookshelf', '📚')">
+        <div class="furniture-image">📚</div>
+        <h2>Bookshelf</h2>
+        <p>5-tier bookshelf perfect for displaying books, decor, and collectibles. Adjustable shelves for maximum flexibility.</p>
+        <button class="craft-button">Customize Bookshelf</button>
+      </div>
+
+      <div class="furniture-card fade-in" onclick="openMaterialModal('desk', 'Office Desk', '💻')">
+        <div class="furniture-image">💻</div>
+        <h2>Office Desk</h2>
+        <p>Modern office desk with cable management and optional drawers. Perfect for home office or study space.</p>
+        <button class="craft-button">Customize Desk</button>
+      </div>
+
+      <div class="furniture-card fade-in" onclick="openMaterialModal('stool', 'Bar Stool', '🪑')">
+        <div class="furniture-image">🪑</div>
+        <h2>Bar Stool</h2>
+        <p>Contemporary bar stool with adjustable height. Perfect for kitchen islands or home bars with comfortable seating.</p>
+        <button class="craft-button">Customize Stool</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Material Selection Modal -->
+  <div id="materialModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Choose Material</h2>
+        <button class="close-modal" onclick="closeMaterialModal()">&times;</button>
+      </div>
+
+      <div id="selectedFurniture">
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <div id="selectedFurnitureIcon" style="font-size: 4rem; margin-bottom: 1rem;"></div>
+          <h3 id="selectedFurnitureName"></h3>
+          <p id="selectedFurniturePrice" style="color: #8B4513; font-weight: 600;"></p>
+        </div>
+      </div>
+
+      <div id="recommendationsSection" style="margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #8B4513; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-star"></i> Recommended Materials
+        </h3>
+        <div id="recommendationsGrid" class="material-grid">
+          <!-- Recommendations will be populated here -->
+        </div>
+      </div>
+
+      <h3 style="margin-bottom: 1rem; color: #495057;">All Materials:</h3>
+      <div id="cautionMessage" style="display: none; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; color: #856404;">
+        <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+        <strong>Caution:</strong> This material may not be the best choice for this furniture type. It could affect durability, comfort, or aesthetics. Consider a recommended material for optimal results.
+      </div>
+      <div class="material-grid">
+        <div class="material-card" onclick="selectMaterial('oak', 'Oak Wood', 'Premium hardwood with rich grain patterns', '$0')">
+          <div class="material-icon">🌳</div>
+          <h3>Oak Wood</h3>
+          <p>Premium hardwood with rich grain patterns</p>
+        </div>
+
+        <div class="material-card" onclick="selectMaterial('walnut', 'Walnut Wood', 'Luxurious dark wood with beautiful figuring', '+$150')">
+          <div class="material-icon">🪵</div>
+          <h3>Walnut Wood</h3>
+          <p>Luxurious dark wood with beautiful figuring</p>
+        </div>
+
+        <div class="material-card" onclick="selectMaterial('pine', 'Pine Wood', 'Lightweight and affordable softwood', '-$50')">
+          <div class="material-icon">🌲</div>
+          <h3>Pine Wood</h3>
+          <p>Lightweight and affordable softwood</p>
+        </div>
+
+        <div class="material-card" onclick="selectMaterial('steel', 'Stainless Steel', 'Modern and durable metal construction', '+$200')">
+          <div class="material-icon">⚙️</div>
+          <h3>Stainless Steel</h3>
+          <p>Modern and durable metal construction</p>
+        </div>
+
+        <div class="material-card" onclick="selectMaterial('aluminum', 'Aluminum', 'Lightweight metal with sleek finish', '+$100')">
+          <div class="material-icon">🔧</div>
+          <h3>Aluminum</h3>
+          <p>Lightweight metal with sleek finish</p>
+        </div>
+
+        <div class="material-card" onclick="selectMaterial('fabric', 'Premium Fabric', 'Soft and comfortable upholstery', '+$75')">
+          <div class="material-icon">🛏️</div>
+          <h3>Premium Fabric</h3>
+          <p>Soft and comfortable upholstery</p>
+        </div>
+
+        <div class="material-card" onclick="selectMaterial('leather', 'Genuine Leather', 'Luxurious genuine leather upholstery', '+$300')">
+          <div class="material-icon">🪑</div>
+          <h3>Genuine Leather</h3>
+          <p>Luxurious genuine leather upholstery</p>
+        </div>
+
+        <div class="material-card" onclick="selectMaterial('plastic', 'High-Grade Plastic', 'Durable and easy to clean', '-$25')">
+          <div class="material-icon">🪟</div>
+          <h3>High-Grade Plastic</h3>
+          <p>Durable and easy to clean</p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeMaterialModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="proceedToCustomization()">Proceed to Customization</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Set user name from session storage
+    const userName = sessionStorage.getItem('username');
+    if (userName) {
+      document.getElementById('user').textContent = `Welcome, ${userName}!`;
+    }
+
+    let selectedFurniture = {};
+    let selectedMaterial = {};
+
+    // Material recommendations based on furniture type
+    const materialRecommendations = {
+      chair: ['fabric', 'leather', 'oak'],
+      table: ['oak', 'walnut', 'pine'],
+      sofa: ['fabric', 'leather'],
+      cabinet: ['oak', 'pine', 'walnut'],
+      bed: ['oak', 'pine', 'fabric'],
+      bookshelf: ['oak', 'pine', 'walnut'],
+      desk: ['oak', 'walnut', 'steel'],
+      stool: ['fabric', 'leather', 'steel']
+    };
+
+    // All materials data
+    const allMaterials = {
+      oak: { name: 'Oak Wood', description: 'Premium hardwood with rich grain patterns', priceModifier: '$0', icon: '🌳' },
+      walnut: { name: 'Walnut Wood', description: 'Luxurious dark wood with beautiful figuring', priceModifier: '+$150', icon: '🪵' },
+      pine: { name: 'Pine Wood', description: 'Lightweight and affordable softwood', priceModifier: '-$50', icon: '🌲' },
+      steel: { name: 'Stainless Steel', description: 'Modern and durable metal construction', priceModifier: '+$200', icon: '⚙️' },
+      aluminum: { name: 'Aluminum', description: 'Lightweight metal with sleek finish', priceModifier: '+$100', icon: '🔧' },
+      fabric: { name: 'Premium Fabric', description: 'Soft and comfortable upholstery', priceModifier: '+$75', icon: '🛏️' },
+      leather: { name: 'Genuine Leather', description: 'Luxurious genuine leather upholstery', priceModifier: '+$300', icon: '🪑' },
+      plastic: { name: 'High-Grade Plastic', description: 'Durable and easy to clean', priceModifier: '-$25', icon: '🪟' }
+    };
+
+    // Open material selection modal
+    function openMaterialModal(type, name, price, icon) {
+      selectedFurniture = { type, name, price, icon };
+      document.getElementById('modalTitle').textContent = `Customize ${name}`;
+      document.getElementById('selectedFurnitureIcon').textContent = icon;
+      document.getElementById('selectedFurnitureName').textContent = name;
+      document.getElementById('selectedFurniturePrice').textContent = `Starting from ${price}`;
+
+      // Populate recommendations
+      const recommendationsGrid = document.getElementById('recommendationsGrid');
+      recommendationsGrid.innerHTML = '';
+
+      const recommendedMaterials = materialRecommendations[type] || ['oak', 'fabric'];
+      recommendedMaterials.forEach(materialKey => {
+        const material = allMaterials[materialKey];
+        if (material) {
+          const card = document.createElement('div');
+          card.className = 'material-card recommended';
+          card.onclick = () => selectMaterial(materialKey, material.name, material.description, material.priceModifier);
+          card.innerHTML = `
+            <div class="material-icon">${material.icon}</div>
+            <h3>${material.name}</h3>
+            <p>${material.description}</p>
+            <div style="position: absolute; top: 10px; right: 10px; color: #FFD700; font-size: 1.2rem;"><i class="fas fa-star"></i></div>
+          `;
+          recommendationsGrid.appendChild(card);
+        }
+      });
+
+      document.getElementById('materialModal').classList.add('show');
+    }
+
+    // Close material selection modal
+    function closeMaterialModal() {
+      document.getElementById('materialModal').classList.remove('show');
+      // Clear selections
+      document.querySelectorAll('.material-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      selectedMaterial = {};
+      // Hide caution message
+      document.getElementById('cautionMessage').style.display = 'none';
+    }
+
+    // Select material
+    function selectMaterial(type, name, description, priceModifier) {
+      // Remove previous selection
+      document.querySelectorAll('.material-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+
+      // Add selection to clicked card
+      event.target.closest('.material-card').classList.add('selected');
+
+      selectedMaterial = { type, name, description, priceModifier };
+
+      // Check if material is recommended for the selected furniture
+      const recommendedMaterials = materialRecommendations[selectedFurniture.type] || [];
+      const isRecommended = recommendedMaterials.includes(type);
+
+      // Show or hide caution message
+      const cautionMessage = document.getElementById('cautionMessage');
+      if (isRecommended) {
+        cautionMessage.style.display = 'none';
+      } else {
+        cautionMessage.style.display = 'block';
+      }
+    }
+
+    // Proceed to customization
+    function proceedToCustomization() {
+      if (!selectedMaterial.type) {
+        alert('Please select a material first!');
+        return;
+      }
+
+      // Store selections in session storage for next page
+      sessionStorage.setItem('selectedFurniture', JSON.stringify(selectedFurniture));
+      sessionStorage.setItem('selectedMaterial', JSON.stringify(selectedMaterial));
+
+      // Close modal and redirect
+      closeMaterialModal();
+      window.location.href = 'customization.html';
+    }
+
+    // Add click animation feedback
+    document.querySelectorAll('.furniture-card').forEach(card => {
+      card.addEventListener('click', function() {
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 150);
+      });
+    });
+
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.furniture-card').forEach(card => {
+      card.style.animationPlayState = 'paused';
+      observer.observe(card);
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('materialModal').addEventListener('click', function(event) {
+      if (event.target === this) {
+        closeMaterialModal();
+      }
+    });
+  </script>
+</body>
+</html>

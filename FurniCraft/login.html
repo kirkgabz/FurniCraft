@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FurniCraft Login - Craft Your Space</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    /* Enhanced CSS: Furniture Crafting Theme */
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, #8B4513 0%, #A0522D 25%, #D2691E 50%, #CD853F 75%, #DEB887 100%);
+      background-size: 400% 400%;
+      animation: woodGrainShift 15s ease-in-out infinite alternate;
+      position: relative;
+    }
+    
+    /* Wood Grain Animation */
+    @keyframes woodGrainShift {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+    
+    /* Subtle Wood Texture Overlay */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="100" y2="100" stroke="%23FFFFFF" stroke-width="0.5" opacity="0.05"/><line x1="0" y1="100" x2="100" y2="0" stroke="%23FFFFFF" stroke-width="0.3" opacity="0.03"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    /* Floating Furniture Particles */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .particle {
+      position: absolute;
+      font-size: 2rem;
+      color: rgba(255, 255, 255, 0.1);
+      animation: float 20s infinite linear;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+    
+    /* Login Box: Wood Plank Design */
+    .login-box {
+      background: linear-gradient(145deg, rgba(139, 69, 19, 0.9) 0%, rgba(160, 82, 45, 0.9) 100%);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      width: 90%;
+      max-width: 380px;
+      color: #F5F5DC; /* Beige for readability */
+      box-shadow: 
+        0 15px 35px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.2),
+        inset 0 -1px 0 rgba(0,0,0,0.2);
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      border: 2px solid rgba(210, 105, 30, 0.6); /* Wood border */
+      animation: fadeInUp 1s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Header with Crafting Icon */
+    .login-header {
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    
+    .login-header i {
+      font-size: 3rem;
+      color: #D2691E;
+      margin-bottom: 0.5rem;
+      display: block;
+      animation: hammer 2s infinite;
+    }
+    
+    @keyframes hammer {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      75% { transform: rotate(-5deg); }
+    }
+    
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin: 0 0 0.5rem 0;
+      color: #F5DEB3;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .tagline {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin: 0;
+      font-style: italic;
+    }
+    
+    /* Input Groups with Icons */
+    .input-group {
+      text-align: left;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    .input-group i {
+      position: absolute;
+      left: 1rem;
+      top: 2.8rem;
+      color: #D2691E;
+      z-index: 1;
+      transition: color 0.3s;
+    }
+    
+    .input-group:focus-within i {
+      color: #FFD700; /* Gold accent on focus */
+    }
+    
+    label {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #F5DEB3;
+      font-size: 0.95rem;
+    }
+    
+    input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem; /* Space for icon */
+      border: 2px solid rgba(210, 105, 30, 0.5);
+      border-radius: 12px;
+      outline: none;
+      font-size: 1rem;
+      background: rgba(245, 222, 179, 0.2);
+      color: #333;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+    
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    input:focus {
+      border-color: #D2691E;
+      background: rgba(245, 222, 179, 0.3);
+      transform: scale(1.02);
+      box-shadow: 0 0 10px rgba(210, 105, 30, 0.5);
+    }
+    
+    /* Button: Crafted Wood Look */
+    button {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(145deg, #D2691E 0%, #CD853F 100%);
+      border: none;
+      border-radius: 12px;
+      color: #F5F5DC;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    button::before {
+      content: '\f0b1'; /* Font Awesome hammer icon */
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      margin-right: 0.5rem;
+    }
+    
+    button:hover {
+      background: linear-gradient(145deg, #CD853F 0%, #D2691E 100%);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 5px 15px rgba(210, 105, 30, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0) scale(1);
+    }
+    
+    /* Error Message: Wood Warning */
+    .error {
+      display: none;
+      background: linear-gradient(145deg, rgba(178, 34, 34, 0.6) 0%, rgba(139, 0, 0, 0.6) 100%);
+      color: #F5DEB3;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(220, 20, 60, 0.5);
+      animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 480px) {
+      .login-box {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+      }
+      
+      h1 { font-size: 1.7rem; }
+      .login-header i { font-size: 2.5rem; }
+    }
+    
+    /* Footer Tagline */
+    .footer-tag {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      opacity: 0.7;
+      font-style: italic;
+    }
+
+    /* Language Button */
+    .language-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(145deg, #D2691E 0%, #CD853F 100%);
+      border: none;
+      border-radius: 8px;
+      color: #F5F5DC;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .language-btn i {
+      font-size: 1.2rem;
+    }
+
+    .language-btn:hover {
+      background: linear-gradient(145deg, #CD853F 0%, #D2691E 100%);
+      transform: scale(1.05);
+    }
+
+    .language-btn::before {
+      content: none;
+    }
+
+    .language-dropdown {
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background: linear-gradient(145deg, rgba(139, 69, 19, 0.95) 0%, rgba(160, 82, 45, 0.95) 100%);
+      border-radius: 8px;
+      padding: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      display: none;
+      z-index: 3;
+      min-width: 120px;
+    }
+
+    .language-dropdown.show {
+      display: block;
+    }
+
+    .language-option {
+      color: #F5DEB3;
+      padding: 0.5rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+
+    .language-option:hover {
+      background: rgba(210, 105, 30, 0.3);
+    }
+
+    /* Terms and Conditions */
+    .terms-group {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+
+    .terms-group label {
+      font-size: 0.9rem;
+      color: #F5DEB3;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .terms-group input[type="checkbox"] {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #D2691E;
+      border-radius: 4px;
+      background: rgba(245, 222, 179, 0.2);
+      cursor: pointer;
+      position: relative;
+      margin-right: 0.5rem;
+    }
+
+    .terms-group input[type="checkbox"]:checked {
+      background: #D2691E;
+    }
+
+    .terms-group input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #F5F5DC;
+      font-size: 12px;
+    }
+
+    .terms-link {
+      color: #FFD700;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 10;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(145deg, rgba(139, 69, 19, 0.95) 0%, rgba(160, 82, 45, 0.95) 100%);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      color: #F5F5DC;
+      border: 2px solid rgba(210, 105, 30, 0.6);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    .modal-content h2 {
+      font-family: 'Playfair Display', serif;
+      color: #F5DEB3;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .modal-content p {
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .close-btn {
+      background: linear-gradient(145deg, #D2691E 0%, #CD853F 100%);
+      border: none;
+      border-radius: 8px;
+      color: #F5F5DC;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .close-btn:hover {
+      background: linear-gradient(145deg, #CD853F 0%, #D2691E 100%);
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Particles for Crafting Theme -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Language Button -->
+  <button class="language-btn" id="languageBtn"><i class="fas fa-bars"></i></button>
+  <div class="language-dropdown" id="languageDropdown">
+    <div class="language-option" data-lang="en">English</div>
+    <div class="language-option" data-lang="es">Español</div>
+    <div class="language-option" data-lang="fr">Français</div>
+    <div class="language-option" data-lang="de">Deutsch</div>
+    <div class="language-option" data-lang="it">Italiano</div>
+  </div>
+  
+  <div class="login-box">
+    <div class="login-header">
+      <i class="fas fa-hammer"></i>
+      <h1>Welcome to FurniCraft</h1>
+      <p class="tagline">Craft Your Perfect Furniture</p>
+    </div>
+    
+    <form id="loginForm">
+      <div class="error" id="errorMsg">Please fill out all fields correctly.</div>
+      
+      <div class="input-group">
+        <label for="name"><i class="fas fa-user"></i> Name</label>
+        <input type="text" id="name" placeholder="Enter your full name" required>
+      </div>
+      
+      <div class="input-group">
+        <label for="mobile"><i class="fas fa-mobile-alt"></i> Mobile Number</label>
+        <input type="tel" id="mobile" placeholder="e.g., 09XXXXXXXXX" pattern="[0-9]{11}" required>
+      </div>
+
+      <div class="terms-group">
+        <label>
+          <input type="checkbox" id="termsCheckbox" required>
+          I agree to the <a href="#" class="terms-link">Terms and Conditions</a>
+        </label>
+      </div>
+      
+      <button type="submit" id="submitBtn" disabled>Start Crafting</button>
+    </form>
+    
+    <p class="footer-tag">Build, Design, Create – With Ease</p>
+  </div>
+
+  <!-- Terms and Conditions Modal -->
+  <div class="modal" id="termsModal">
+    <div class="modal-content">
+      <h2>Terms and Conditions</h2>
+      <p>Welcome to FurniCraft! By using our furniture customization platform, you agree to the following terms:</p>
+      <p><strong>1. Acceptance of Terms:</strong> By accessing and using FurniCraft, you accept and agree to be bound by the terms and provision of this agreement.</p>
+      <p><strong>2. Use License:</strong> Permission is granted to temporarily use FurniCraft for personal, non-commercial transitory viewing only.</p>
+      <p><strong>3. Disclaimer:</strong> The information on this platform is provided on an 'as is' basis. FurniCraft disclaims all warranties, express or implied.</p>
+      <p><strong>4. Limitations:</strong> In no event shall FurniCraft or its suppliers be liable for any damages arising out of the use or inability to use the platform.</p>
+      <p><strong>5. Accuracy of Materials:</strong> The materials appearing on FurniCraft could include technical, typographical, or photographic errors.</p>
+      <p><strong>6. Modifications:</strong> FurniCraft may revise these terms of service at any time without notice.</p>
+      <p><strong>7. Governing Law:</strong> These terms and conditions are governed by and construed in accordance with the laws of your jurisdiction.</p>
+      <button class="close-btn" id="closeModal">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // Enhanced JS: Form Validation + Particles
+    const form = document.getElementById("loginForm");
+    const errorMsg = document.getElementById("errorMsg");
+    const submitBtn = document.getElementById("submitBtn");
+    const termsCheckbox = document.getElementById("termsCheckbox");
+    const languageBtn = document.getElementById("languageBtn");
+    const languageDropdown = document.getElementById("languageDropdown");
+
+    // Create Floating Particles (Furniture Icons)
+    function createParticles() {
+      const particlesContainer = document.getElementById("particles");
+      const icons = ['\uf5c2', '\uf1fa', '\uf6bb', '\uf0e4']; // Chair, bed, table, door (Font Awesome)
+      for (let i = 0; i < 10; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+        particle.innerHTML = `<i class="fas" style="font-size: ${Math.random() * 2 + 1}rem;">${icons[Math.floor(Math.random() * icons.length)]}</i>`;
+        particle.style.left = Math.random() * 100 + "%";
+        particle.style.animationDelay = Math.random() * 20 + "s";
+        particle.style.animationDuration = (Math.random() * 10 + 15) + "s";
+        particlesContainer.appendChild(particle);
+      }
+    }
+    
+    createParticles(); // Init particles on load
+
+    // Language Dropdown Toggle
+    languageBtn.addEventListener("click", function() {
+      languageDropdown.classList.toggle("show");
+    });
+
+    // Close dropdown if clicked outside
+    document.addEventListener("click", function(event) {
+      if (!languageBtn.contains(event.target) && !languageDropdown.contains(event.target)) {
+        languageDropdown.classList.remove("show");
+      }
+    });
+
+    // Language options (view only, no functionality)
+    const languageOptions = document.querySelectorAll(".language-option");
+    languageOptions.forEach(option => {
+      option.addEventListener("click", function() {
+        alert(`Language selection is for viewing purposes only. Site remains in English.`);
+        languageDropdown.classList.remove("show");
+      });
+    });
+
+    // Terms Checkbox Handler
+    termsCheckbox.addEventListener("change", function() {
+      submitBtn.disabled = !this.checked;
+      if (!this.checked) {
+        submitBtn.style.opacity = "0.6";
+      } else {
+        submitBtn.style.opacity = "1";
+      }
+    });
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+
+      // Enhanced Validation including T&C
+      if (!termsCheckbox.checked) {
+        errorMsg.style.display = "block";
+        errorMsg.textContent = "You must agree to the Terms and Conditions.";
+        return;
+      }
+      if (!name || !mobile || !/^[0-9]{11}$/.test(mobile)) {
+        errorMsg.style.display = "block";
+        errorMsg.textContent = !name ? "Name is required." : !mobile ? "Mobile number is required." : "Mobile must be 11 digits (e.g., 09XXXXXXXXX).";
+      } else {
+        errorMsg.style.display = "none";
+        sessionStorage.setItem("username", name);
+        // Add smooth transition to main
+        document.body.style.transition = "opacity 0.5s";
+        document.body.style.opacity = "0";
+        setTimeout(() => {
+          window.location.href = "main.html";
+        }, 500);
+      }
+    });
+
+    // Auto-hide error after 5s
+    setTimeout(() => {
+      if (errorMsg.style.display === "block") {
+        errorMsg.style.display = "none";
+      }
+    }, 5000);
+
+    // Terms Modal Handlers
+    const termsLink = document.querySelector(".terms-link");
+    const termsModal = document.getElementById("termsModal");
+    const closeModal = document.getElementById("closeModal");
+
+    termsLink.addEventListener("click", function(e) {
+      e.preventDefault();
+      termsModal.classList.add("show");
+    });
+
+    closeModal.addEventListener("click", function() {
+      termsModal.classList.remove("show");
+    });
+
+    // Close modal when clicking outside
+    termsModal.addEventListener("click", function(e) {
+      if (e.target === termsModal) {
+        termsModal.classList.remove("show");
+      }
+    });
+  </script>
+</body>
+</html>
