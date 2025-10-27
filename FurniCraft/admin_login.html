@@ -130,30 +130,7 @@
       font-style: italic;
     }
     
-    /* Tabs for Login/Register */
-    .tabs {
-      display: flex;
-      margin-bottom: 2rem;
-      background: rgba(245, 222, 179, 0.1);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    
-    .tab {
-      flex: 1;
-      padding: 0.75rem;
-      cursor: pointer;
-      background: transparent;
-      border: none;
-      color: #F5DEB3;
-      font-weight: 500;
-      transition: all 0.3s;
-    }
-    
-    .tab.active {
-      background: rgba(210, 105, 30, 0.3);
-      color: #FFD700;
-    }
+
     
     /* Input Groups with Icons */
     .input-group {
@@ -382,11 +359,6 @@
       <p class="tagline">Worker Access Portal</p>
     </div>
     
-    <div class="tabs">
-      <button class="tab active" id="loginTab">Login</button>
-      <button class="tab" id="registerTab">Register</button>
-    </div>
-    
     <div id="loginForm">
       <div class="error" id="loginError">Invalid username or password.</div>
       <div class="success" id="loginSuccess">Login successful! Redirecting...</div>
@@ -404,27 +376,7 @@
       <button type="submit" id="loginBtn">Login</button>
     </div>
     
-    <div id="registerForm" style="display: none;">
-      <div class="error" id="registerError">Please fill all fields correctly.</div>
-      <div class="success" id="registerSuccess">Registration successful! You can now login.</div>
 
-      <div class="input-group">
-        <label for="registerUsername"><i class="fas fa-user"></i> Username</label>
-        <input type="text" id="registerUsername" placeholder="Choose a username" required>
-      </div>
-
-      <div class="input-group">
-        <label for="registerPassword"><i class="fas fa-lock"></i> Password</label>
-        <input type="password" id="registerPassword" placeholder="Create password" required>
-      </div>
-
-      <div class="input-group">
-        <label for="confirmPassword"><i class="fas fa-lock"></i> Confirm Password</label>
-        <input type="password" id="confirmPassword" placeholder="Confirm password" required>
-      </div>
-
-      <button type="submit" id="registerBtn">Register</button>
-    </div>
 
     <div class="otp-section" id="otpSection">
       <div class="error" id="otpError" style="display: none;">Invalid OTP. Please try again.</div>
@@ -447,23 +399,17 @@
   </div>
 
   <script>
-    // Enhanced JS: Admin Login/Register
-    const loginTab = document.getElementById("loginTab");
-    const registerTab = document.getElementById("registerTab");
+    // Enhanced JS: Admin Login
     const loginForm = document.getElementById("loginForm");
-    const registerForm = document.getElementById("registerForm");
     const loginError = document.getElementById("loginError");
-    const registerError = document.getElementById("registerError");
     const loginSuccess = document.getElementById("loginSuccess");
-    const registerSuccess = document.getElementById("registerSuccess");
     const loginBtn = document.getElementById("loginBtn");
-    const registerBtn = document.getElementById("registerBtn");
 
     // Default admin credentials (for demo)
-    let adminUsers = JSON.parse(localStorage.getItem('adminUsers')) || [
-      { username: 'admin', password: 'admin123' },
-      { username: 'worker', password: 'worker123' }
+    let adminUsers = [
+      { username: 'kirk@shop.com', password: '123456' }
     ];
+    localStorage.setItem('adminUsers', JSON.stringify(adminUsers));
 
     // Create Floating Particles (Furniture Icons)
     function createParticles() {
@@ -481,29 +427,6 @@
     }
 
     createParticles(); // Init particles on load
-
-    // Tab switching
-    loginTab.addEventListener("click", function() {
-      loginTab.classList.add("active");
-      registerTab.classList.remove("active");
-      loginForm.style.display = "block";
-      registerForm.style.display = "none";
-      loginError.style.display = "none";
-      registerError.style.display = "none";
-      loginSuccess.style.display = "none";
-      registerSuccess.style.display = "none";
-    });
-
-    registerTab.addEventListener("click", function() {
-      registerTab.classList.add("active");
-      loginTab.classList.remove("active");
-      registerForm.style.display = "block";
-      loginForm.style.display = "none";
-      loginError.style.display = "none";
-      registerError.style.display = "none";
-      loginSuccess.style.display = "none";
-      registerSuccess.style.display = "none";
-    });
 
     // OTP functionality
     let generatedOtp = '';
@@ -544,47 +467,6 @@
         loginError.style.display = "block";
         loginSuccess.style.display = "none";
       }
-    });
-
-    // Register functionality
-    registerBtn.addEventListener("click", function(e) {
-      e.preventDefault();
-      const username = document.getElementById("registerUsername").value.trim();
-      const password = document.getElementById("registerPassword").value.trim();
-      const confirmPass = document.getElementById("confirmPassword").value.trim();
-
-      if (!username || !password || !confirmPass) {
-        registerError.style.display = "block";
-        registerError.textContent = "Please fill all fields.";
-        return;
-      }
-
-      if (password !== confirmPass) {
-        registerError.style.display = "block";
-        registerError.textContent = "Passwords do not match.";
-        return;
-      }
-
-      if (password.length < 6) {
-        registerError.style.display = "block";
-        registerError.textContent = "Password must be at least 6 characters.";
-        return;
-      }
-
-      const existingUser = adminUsers.find(u => u.username === username);
-      if (existingUser) {
-        registerError.style.display = "block";
-        registerError.textContent = "Username already exists.";
-        return;
-      }
-
-      adminUsers.push({ username, password });
-      localStorage.setItem('adminUsers', JSON.stringify(adminUsers));
-      registerError.style.display = "none";
-      registerSuccess.style.display = "block";
-      setTimeout(() => {
-        registerTab.click(); // Switch to login tab
-      }, 2000);
     });
 
     // OTP verification
@@ -656,9 +538,6 @@
     setTimeout(() => {
       if (loginError.style.display === "block") {
         loginError.style.display = "none";
-      }
-      if (registerError.style.display === "block") {
-        registerError.style.display = "none";
       }
     }, 5000);
   </script>

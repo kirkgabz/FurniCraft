@@ -255,6 +255,39 @@
       font-style: italic;
     }
 
+    /* Tab Buttons */
+    .tab-buttons {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .tab-btn {
+      background: rgba(245, 222, 179, 0.2);
+      border: 2px solid rgba(210, 105, 30, 0.5);
+      color: #F5DEB3;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 0 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .tab-btn.active {
+      background: #D2691E;
+      color: #F5F5DC;
+    }
+
+    .tab-btn:hover {
+      background: rgba(210, 105, 30, 0.3);
+    }
+
+    /* Form Sections */
+    .form-section {
+      /* No specific styles needed */
+    }
+
     /* Language Button */
     .language-btn {
       position: absolute;
@@ -514,30 +547,70 @@
       <h1>Welcome to FurniCraft</h1>
       <p class="tagline">Craft Your Perfect Furniture</p>
     </div>
-    
-    <form id="loginForm">
-      <div class="error" id="errorMsg">Please fill out all fields correctly.</div>
+
+    <!-- Tab Buttons -->
+    <div class="tab-buttons">
+      <button class="tab-btn active" id="loginTab">Login</button>
+      <button class="tab-btn" id="signupTab">Sign Up</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="form-section">
+      <div class="error" id="loginErrorMsg">Please fill out all fields correctly.</div>
 
       <div class="input-group">
-        <label for="name"><i class="fas fa-user"></i> Name</label>
-        <input type="text" id="name" placeholder="Enter your full name" required>
+        <label for="loginName"><i class="fas fa-user"></i> Name</label>
+        <input type="text" id="loginName" placeholder="Enter your full name" required>
       </div>
 
       <div class="input-group">
-        <label for="mobile"><i class="fas fa-mobile-alt"></i> Mobile Number</label>
-        <input type="tel" id="mobile" placeholder="e.g., 09XXXXXXXXX" pattern="[0-9]{11}" required>
+        <label for="loginMobile"><i class="fas fa-mobile-alt"></i> Mobile Number</label>
+        <input type="tel" id="loginMobile" placeholder="e.g., 09XXXXXXXXX" pattern="[0-9]{11}" required>
+      </div>
+
+      <button type="submit" id="loginSubmitBtn">Send OTP</button>
+    </form>
+
+    <!-- Sign Up Form -->
+    <form id="signupForm" class="form-section" style="display: none;">
+      <div class="error" id="signupErrorMsg">Please fill out all fields correctly.</div>
+
+      <div class="input-group">
+        <label for="signupName"><i class="fas fa-user"></i> Full Name</label>
+        <input type="text" id="signupName" placeholder="Enter your full name" required>
+      </div>
+
+      <div class="input-group">
+        <label for="signupEmail"><i class="fas fa-envelope"></i> Email</label>
+        <input type="email" id="signupEmail" placeholder="Enter your email" required>
+      </div>
+
+      <div class="input-group">
+        <label for="signupMobile"><i class="fas fa-mobile-alt"></i> Mobile Number</label>
+        <input type="tel" id="signupMobile" placeholder="e.g., 09XXXXXXXXX" pattern="[0-9]{11}" required>
+      </div>
+
+      <div class="input-group">
+        <label for="signupPassword"><i class="fas fa-lock"></i> Password</label>
+        <input type="password" id="signupPassword" placeholder="Create a password" required>
+      </div>
+
+      <div class="input-group">
+        <label for="signupConfirmPassword"><i class="fas fa-lock"></i> Confirm Password</label>
+        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required>
       </div>
 
       <div class="terms-group">
         <label>
-          <input type="checkbox" id="termsCheckbox" required>
+          <input type="checkbox" id="signupTermsCheckbox" required>
           I agree to the <a href="#" class="terms-link">Terms and Conditions</a>
         </label>
       </div>
 
-      <button type="submit" id="submitBtn" disabled>Send OTP</button>
+      <button type="submit" id="signupSubmitBtn" disabled>Send OTP</button>
     </form>
 
+    <!-- OTP Section -->
     <div class="otp-section" id="otpSection">
       <div class="error" id="otpErrorMsg" style="display: none;">Invalid OTP. Please try again.</div>
       <p class="otp-message">Enter the 6-digit OTP sent to your mobile number.</p>
@@ -553,7 +626,7 @@
       <p class="copy-otp" id="copyOtp">Fill OTP</p>
       <p class="resend-otp" id="resendOtp">Resend OTP</p>
     </div>
-    
+
     <p class="footer-tag">Build, Design, Create – With Ease</p>
   </div>
 
@@ -574,11 +647,16 @@
   </div>
 
   <script>
-    // Enhanced JS: Form Validation + Particles + OTP
-    const form = document.getElementById("loginForm");
-    const errorMsg = document.getElementById("errorMsg");
-    const submitBtn = document.getElementById("submitBtn");
-    const termsCheckbox = document.getElementById("termsCheckbox");
+    // Enhanced JS: Form Validation + Particles + OTP + Tabs
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const loginErrorMsg = document.getElementById("loginErrorMsg");
+    const signupErrorMsg = document.getElementById("signupErrorMsg");
+    const loginSubmitBtn = document.getElementById("loginSubmitBtn");
+    const signupSubmitBtn = document.getElementById("signupSubmitBtn");
+    const signupTermsCheckbox = document.getElementById("signupTermsCheckbox");
+    const loginTab = document.getElementById("loginTab");
+    const signupTab = document.getElementById("signupTab");
     const languageBtn = document.getElementById("languageBtn");
     const languageDropdown = document.getElementById("languageDropdown");
     const otpSection = document.getElementById("otpSection");
@@ -588,6 +666,7 @@
     const otpInputs = document.querySelectorAll(".otp-input");
 
     let generatedOtp = "123456"; // Simulated OTP for demo
+    let currentForm = "login"; // Track current form
 
     // Create Floating Particles (Furniture Icons)
     function createParticles() {
@@ -605,6 +684,31 @@
     }
 
     createParticles(); // Init particles on load
+
+    // Tab Switching
+    loginTab.addEventListener("click", function() {
+      loginTab.classList.add("active");
+      signupTab.classList.remove("active");
+      loginForm.style.display = "block";
+      signupForm.style.display = "none";
+      currentForm = "login";
+      hideOtpSection();
+    });
+
+    signupTab.addEventListener("click", function() {
+      signupTab.classList.add("active");
+      loginTab.classList.remove("active");
+      signupForm.style.display = "block";
+      loginForm.style.display = "none";
+      currentForm = "signup";
+      hideOtpSection();
+    });
+
+    function hideOtpSection() {
+      otpSection.style.display = "none";
+      loginForm.style.display = currentForm === "login" ? "block" : "none";
+      signupForm.style.display = currentForm === "signup" ? "block" : "none";
+    }
 
     // Language Dropdown Toggle
     languageBtn.addEventListener("click", function() {
@@ -627,14 +731,10 @@
       });
     });
 
-    // Terms Checkbox Handler
-    termsCheckbox.addEventListener("change", function() {
-      submitBtn.disabled = !this.checked;
-      if (!this.checked) {
-        submitBtn.style.opacity = "0.6";
-      } else {
-        submitBtn.style.opacity = "1";
-      }
+    // Terms Checkbox Handlers
+    signupTermsCheckbox.addEventListener("change", function() {
+      signupSubmitBtn.disabled = !this.checked;
+      signupSubmitBtn.style.opacity = this.checked ? "1" : "0.6";
     });
 
     // OTP Input Handling
@@ -651,29 +751,63 @@
       });
     });
 
-    // Send OTP
-    form.addEventListener("submit", function(e) {
+    // Login Form Submit
+    loginForm.addEventListener("submit", function(e) {
       e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const mobile = document.getElementById("mobile").value.trim();
+      const name = document.getElementById("loginName").value.trim();
+      const mobile = document.getElementById("loginMobile").value.trim();
 
-      // Enhanced Validation including T&C
-      if (!termsCheckbox.checked) {
-        errorMsg.style.display = "block";
-        errorMsg.textContent = "You must agree to the Terms and Conditions.";
-        return;
-      }
       if (!name || !mobile || !/^[0-9]{11}$/.test(mobile)) {
-        errorMsg.style.display = "block";
-        errorMsg.textContent = !name ? "Name is required." : !mobile ? "Mobile number is required." : "Mobile must be 11 digits (e.g., 09XXXXXXXXX).";
+        loginErrorMsg.style.display = "block";
+        loginErrorMsg.textContent = !name ? "Name is required." : !mobile ? "Mobile number is required." : "Mobile must be 11 digits (e.g., 09XXXXXXXXX).";
         return;
       }
-      errorMsg.style.display = "none";
+      loginErrorMsg.style.display = "none";
       sessionStorage.setItem("username", name);
 
       // Simulate sending OTP
       alert(`OTP sent to ${mobile}. (Demo: Use 123456)`);
-      form.style.display = "none";
+      loginForm.style.display = "none";
+      otpSection.style.display = "block";
+      otpInputs[0].focus();
+    });
+
+    // Signup Form Submit
+    signupForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = document.getElementById("signupName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const mobile = document.getElementById("signupMobile").value.trim();
+      const password = document.getElementById("signupPassword").value.trim();
+      const confirmPassword = document.getElementById("signupConfirmPassword").value.trim();
+
+      if (!signupTermsCheckbox.checked) {
+        signupErrorMsg.style.display = "block";
+        signupErrorMsg.textContent = "You must agree to the Terms and Conditions.";
+        return;
+      }
+      if (!name || !email || !mobile || !password || !confirmPassword) {
+        signupErrorMsg.style.display = "block";
+        signupErrorMsg.textContent = "All fields are required.";
+        return;
+      }
+      if (!/^[0-9]{11}$/.test(mobile)) {
+        signupErrorMsg.style.display = "block";
+        signupErrorMsg.textContent = "Mobile must be 11 digits (e.g., 09XXXXXXXXX).";
+        return;
+      }
+      if (password !== confirmPassword) {
+        signupErrorMsg.style.display = "block";
+        signupErrorMsg.textContent = "Passwords do not match.";
+        return;
+      }
+      signupErrorMsg.style.display = "none";
+      sessionStorage.setItem("username", name);
+      sessionStorage.setItem("email", email);
+
+      // Simulate sending OTP
+      alert(`OTP sent to ${mobile}. (Demo: Use 123456)`);
+      signupForm.style.display = "none";
       otpSection.style.display = "block";
       otpInputs[0].focus();
     });
@@ -710,7 +844,7 @@
 
     // Resend OTP
     resendOtp.addEventListener("click", function() {
-      const mobile = document.getElementById("mobile").value.trim();
+      const mobile = currentForm === "login" ? document.getElementById("loginMobile").value.trim() : document.getElementById("signupMobile").value.trim();
       alert(`OTP resent to ${mobile}. (Demo: Use 123456)`);
       generatedOtp = "123456"; // Reset for demo
       otpErrorMsg.style.display = "none";
@@ -718,21 +852,16 @@
       otpInputs[0].focus();
     });
 
-    // Auto-hide error after 5s
-    setTimeout(() => {
-      if (errorMsg.style.display === "block") {
-        errorMsg.style.display = "none";
-      }
-    }, 5000);
-
     // Terms Modal Handlers
-    const termsLink = document.querySelector(".terms-link");
+    const termsLinks = document.querySelectorAll(".terms-link");
     const termsModal = document.getElementById("termsModal");
     const closeModal = document.getElementById("closeModal");
 
-    termsLink.addEventListener("click", function(e) {
-      e.preventDefault();
-      termsModal.classList.add("show");
+    termsLinks.forEach(link => {
+      link.addEventListener("click", function(e) {
+        e.preventDefault();
+        termsModal.classList.add("show");
+      });
     });
 
     closeModal.addEventListener("click", function() {
