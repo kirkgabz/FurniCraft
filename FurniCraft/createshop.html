@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FurniCraft - Craft Furniture</title>
+  <title>FurniCraft - Create Furniture Shop</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -202,7 +202,7 @@
     /* Main Content */
     main {
       padding: 3rem 2rem;
-      max-width: 1400px;
+      max-width: 800px;
       margin: 0 auto;
     }
 
@@ -225,102 +225,67 @@
       margin: 0 auto;
     }
 
-    /* Furniture Grid */
-    .furniture-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
-
-    .furniture-card {
+    /* Form Styles */
+    .application-form {
       background: linear-gradient(145deg, #ffffff, #f8f9fa);
       border-radius: 20px;
-      padding: 2rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      padding: 3rem;
+      box-shadow: 0 10px 30px rgba(139, 69, 19, 0.1);
       border: 1px solid rgba(139, 69, 19, 0.1);
-      position: relative;
-      overflow: hidden;
     }
 
-    .furniture-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #8B4513, #CD853F, #A0522D);
-      transform: scaleX(0);
-      transition: transform 0.4s ease;
+    .form-group {
+      margin-bottom: 2rem;
     }
 
-    .furniture-card:hover::before {
-      transform: scaleX(1);
-    }
-
-    .furniture-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 20px 40px rgba(139, 69, 19, 0.15), 0 15px 25px rgba(0, 0, 0, 0.1);
-      border-color: rgba(139, 69, 19, 0.2);
-    }
-
-    .furniture-image {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 1.5rem;
-      background: linear-gradient(135deg, #8B4513, #CD853F);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    .furniture-card:hover .furniture-image {
-      transform: scale(1.1) rotate(5deg);
-      background: linear-gradient(135deg, #A0522D, #D2691E);
-    }
-
-    .furniture-card h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
+    .form-group label {
+      display: block;
       font-weight: 600;
       color: #2c3e50;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
     }
 
-    .furniture-card p {
-      color: #6c757d;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.3s ease;
     }
 
-    .furniture-card .price {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #8B4513;
-      margin-bottom: 1rem;
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #8B4513;
+      box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
     }
 
-    .craft-button {
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .submit-btn {
       background: linear-gradient(135deg, #8B4513, #CD853F);
       color: white;
       border: none;
-      padding: 0.75rem 1.5rem;
+      padding: 1rem 2rem;
       border-radius: 25px;
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 1.1rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-size: 0.9rem;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
     }
 
-    .craft-button:hover {
+    .submit-btn:hover {
       background: linear-gradient(135deg, #A0522D, #D2691E);
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
@@ -355,8 +320,8 @@
         padding: 2rem 1rem;
       }
 
-      .furniture-grid {
-        grid-template-columns: 1fr;
+      .application-form {
+        padding: 2rem;
       }
     }
 
@@ -397,7 +362,10 @@
 
   <!-- Navigation Menu -->
   <nav class="nav-menu" id="navMenu">
-    <a href="craft.html" class="nav-item" onclick="closeNav()">
+    <a href="main.html" class="nav-item" onclick="closeNav()">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="#" class="nav-item" onclick="closeNav()">
       <i class="fas fa-tools"></i> Craft a Furniture
     </a>
     <a href="templates.html" class="nav-item" onclick="closeNav()">
@@ -416,7 +384,10 @@
 
   <!-- Side Panel -->
   <nav class="side-panel" id="sidePanel">
-    <a href="craft.html" class="side-item" onclick="closeSidePanel()">
+    <a href="main.html" class="side-item" onclick="closeSidePanel()">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="#" class="side-item" onclick="closeSidePanel()">
       <i class="fas fa-tools"></i> Craft a Furniture
     </a>
     <a href="templates.html" class="side-item" onclick="closeSidePanel()">
@@ -435,25 +406,69 @@
 
   <main>
     <div class="page-header">
-      <h1>Choose Your Dashboard</h1>
-      <p>Select the perfect dashboard to start your FurniCraft journey. Customize furniture, manage orders, or oversee production.</p>
+      <h1>Furniture Shop Certification Application</h1>
+      <p>Apply for certification to operate your furniture shop. Fill out the form below with accurate information.</p>
     </div>
 
-    <div class="furniture-grid">
-      <div class="furniture-card fade-in" onclick="location.href='craft.html'">
-        <div class="furniture-image">🛠️</div>
-        <h2>Craft a Furniture</h2>
-        <p>Customize and create your own furniture designs.</p>
-        <button class="craft-button">Craft Furniture</button>
+    <form class="application-form fade-in" id="certificationForm">
+      <div class="form-group">
+        <label for="shopName">Shop Name *</label>
+        <input type="text" id="shopName" name="shopName" required>
       </div>
 
-      <div class="furniture-card fade-in" onclick="location.href='templates.html'">
-        <div class="furniture-image">📋</div>
-        <h2>View Furniture Templates</h2>
-        <p>Browse and select from pre-designed furniture templates.</p>
-        <button class="craft-button">View Templates</button>
+      <div class="form-group">
+        <label for="ownerName">Owner Full Name *</label>
+        <input type="text" id="ownerName" name="ownerName" required>
       </div>
-    </div>
+
+      <div class="form-group">
+        <label for="email">Email Address *</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number *</label>
+        <input type="tel" id="phone" name="phone" required>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Shop Address *</label>
+        <textarea id="address" name="address" placeholder="Street address, city, state, zip code" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="licenseNumber">Business License Number *</label>
+        <input type="text" id="licenseNumber" name="licenseNumber" required>
+      </div>
+
+      <div class="form-group">
+        <label for="shopType">Shop Type</label>
+        <select id="shopType" name="shopType">
+          <option value="">Select shop type</option>
+          <option value="retail">Retail Store</option>
+          <option value="workshop">Workshop/Manufacturing</option>
+          <option value="online">Online Only</option>
+          <option value="hybrid">Hybrid (Online + Physical)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Shop Description</label>
+        <textarea id="description" name="description" placeholder="Describe your furniture shop, products offered, and unique features"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="experience">Years of Experience</label>
+        <input type="number" id="experience" name="experience" min="0" placeholder="Years in furniture business">
+      </div>
+
+      <div class="form-group">
+        <label for="certificationReason">Why do you want certification?</label>
+        <textarea id="certificationReason" name="certificationReason" placeholder="Explain why you want to be certified and how it will benefit your business"></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn">Submit Application</button>
+    </form>
   </main>
 
   <script>
@@ -488,16 +503,6 @@
       }
     });
 
-    // Add click animation feedback
-    document.querySelectorAll('.furniture-card').forEach(card => {
-      card.addEventListener('click', function() {
-        this.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-          this.style.transform = '';
-        }, 150);
-      });
-    });
-
     // Toggle side panel
     function toggleSidePanel() {
       const sidePanel = document.getElementById('sidePanel');
@@ -521,6 +526,14 @@
       if (!sidePanel.contains(event.target) && !sideHamburger.contains(event.target)) {
         closeSidePanel();
       }
+    });
+
+    // Form submission
+    document.getElementById('certificationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Application submitted successfully! We will review your application and get back to you within 5-7 business days.');
+      // Here you can add code to send the form data to a server
+      this.reset();
     });
   </script>
 </body>

@@ -157,6 +157,16 @@
       margin-bottom: 1rem;
     }
 
+    .material-parts {
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #495057;
+    }
+
+    .material-parts div {
+      margin-bottom: 0.5rem;
+    }
+
     .item-gif {
       width: 200px;
       height: 200px;
@@ -342,13 +352,20 @@
     </div>
 
     <div class="customization-container fade-in">
-      <div class="selected-item">
+        <div class="selected-item">
         <div id="itemImage" class="item-image"></div>
         <h2 id="itemName"></h2>
         <div id="itemImage2" class="item-image2"></div>
         <div class="material" id="itemMaterial"></div>
+        <div id="materialParts" class="material-parts"></div>
+        <div id="shapeParts" class="material-parts"></div>
         <p id="itemDescription"></p>
         <img id="itemGif" class="item-gif" src="" alt="Furniture Animation">
+
+        <div class="custom-description" style="margin-top: 1rem; text-align: left;">
+          <label for="customDescription" style="display: block; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Additional Design Notes:</label>
+          <textarea id="customDescription" rows="3" placeholder="Enter any additional design notes or descriptions for your furniture..." style="width: 100%; padding: 0.5rem; border: 1px solid #dee2e6; border-radius: 5px; font-family: inherit; resize: vertical;"></textarea>
+        </div>
       </div>
 
       <div class="customization-options">
@@ -425,17 +442,20 @@
         <div class="option-group">
           <label>Size:</label>
           <div class="option-grid">
-            <div class="option-card selected" data-category="size" onclick="selectOption('size', 'standard')">
-              <span style="font-size: 1.5rem;">📏</span><br>
-              <span>Standard</span>
-            </div>
             <div class="option-card" data-category="size" onclick="selectOption('size', 'compact')">
               <span style="font-size: 1.5rem;">📐</span><br>
-              <span>Compact</span>
+              <span>Compact</span><br>
+              <small style="font-size: 0.8rem; color: #6c757d;">6x12 ft</small>
+            </div>
+            <div class="option-card selected" data-category="size" onclick="selectOption('size', 'standard')">
+              <span style="font-size: 1.5rem;">📏</span><br>
+              <span>Standard</span><br>
+              <small style="font-size: 0.8rem; color: #6c757d;">8x16 ft</small>
             </div>
             <div class="option-card" data-category="size" onclick="selectOption('size', 'large')">
               <span style="font-size: 1.5rem;">📏</span><br>
-              <span>Large</span>
+              <span>Large</span><br>
+              <small style="font-size: 0.8rem; color: #6c757d;">10x20 ft</small>
             </div>
           </div>
         </div>
@@ -449,7 +469,7 @@
           </div>
         </div>
 
-
+        <div id="itemPrice" class="price" style="font-size: 1.5rem; font-weight: 700; color: #8B4513; text-align: center; margin: 1rem 0;"></div>
 
         <div style="display: flex; gap: 1rem; margin-top: 2rem;">
           <button class="proceed-btn" onclick="saveAsPNG()" style="flex: 1;">Save as PNG</button>
@@ -460,10 +480,17 @@
   </main>
 
   <script>
-    // Temporary: Set test data for testing
-    sessionStorage.setItem('selectedFurniture', JSON.stringify({name: 'Test Chair', type: 'chair'}));
-    sessionStorage.setItem('selectedMaterial', JSON.stringify({name: 'Wood', type: 'wood'}));
-    sessionStorage.setItem('username', 'Test User');
+    // All materials data (same as in craft.html)
+    const allMaterials = {
+      narra: { name: 'Narra Wood', description: 'Exotic Philippine hardwood with rich reddish-brown color', priceModifier: '+$200', icon: '🌳', durability: 90, quality: 95 },
+      aninapla: { name: 'Aninapla Wood', description: 'Dark brown hardwood known for its durability', priceModifier: '+$100', icon: '🌲', durability: 85, quality: 90 },
+      mahogany: { name: 'Mahogany Wood', description: 'Classic hardwood with deep red tones and fine grain', priceModifier: '+$150', icon: '🪵', durability: 88, quality: 92 },
+      steel: { name: 'Stainless Steel', description: 'Modern and durable metal construction', priceModifier: '+$200', icon: '⚙️', durability: 95, quality: 85 },
+      aluminum: { name: 'Aluminum', description: 'Lightweight metal with sleek finish', priceModifier: '+$100', icon: '🔧', durability: 80, quality: 80 },
+      fabric: { name: 'Premium Fabric', description: 'Soft and comfortable upholstery', priceModifier: '+$75', icon: '🛏️', durability: 60, quality: 70 },
+      leather: { name: 'Genuine Leather', description: 'Luxurious genuine leather upholstery', priceModifier: '+$300', icon: '🪑', durability: 75, quality: 90 },
+      plastic: { name: 'High-Grade Plastic', description: 'Durable and easy to clean', priceModifier: '-$25', icon: '🪟', durability: 70, quality: 65 }
+    };
 
     // Set user name from session storage
     const userName = sessionStorage.getItem('username');
@@ -473,122 +500,11 @@
 
     // Get selected furniture and material from session storage
     const selectedFurniture = JSON.parse(sessionStorage.getItem('selectedFurniture') || '{}');
-    const selectedMaterial = JSON.parse(sessionStorage.getItem('selectedMaterial') || '{}');
+    const selectedMaterials = JSON.parse(sessionStorage.getItem('selectedMaterials') || '{}');
+    const selectedShapes = JSON.parse(sessionStorage.getItem('selectedShapes') || '{}');
+    const isCombined = sessionStorage.getItem('isCombined') === 'true';
 
-    // Furniture image map
-    const imageMap = {
-      chair: {
-        natural: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop',
-        dark: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop',
-        light: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop',
-        ebony: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        cherry: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        walnut: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        mahogany: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        teak: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        maple: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80'
-      },
-      table: {
-        natural: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop',
-        dark: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop',
-        light: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop',
-        ebony: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        cherry: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        walnut: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        mahogany: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        teak: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        maple: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80'
-      },
-      sofa: {
-        natural: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop',
-        dark: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop',
-        light: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop',
-        ebony: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        cherry: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        walnut: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        mahogany: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        teak: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        maple: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80'
-      },
-      cabinet: {
-        natural: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop',
-        dark: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop',
-        light: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop',
-        ebony: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        cherry: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        walnut: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        mahogany: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        teak: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        maple: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80'
-      },
-      bed: {
-        natural: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop',
-        dark: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop',
-        light: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop',
-        ebony: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        cherry: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        walnut: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        mahogany: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        teak: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        maple: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80'
-      },
-      bookshelf: {
-        natural: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop',
-        dark: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop',
-        light: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop',
-        ebony: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        cherry: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        walnut: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        mahogany: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        teak: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        maple: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80'
-      },
-      desk: {
-        natural: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop',
-        dark: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop',
-        light: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop',
-        ebony: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        cherry: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        walnut: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        mahogany: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        teak: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        maple: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80'
-      },
-      stool: {
-        natural: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop',
-        dark: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop',
-        light: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop',
-        ebony: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        cherry: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        walnut: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        mahogany: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        teak: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=150&h=150&fit=crop&auto=format&fit=crop&q=80',
-        maple: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=150&h=150&fit=crop&auto=format&fit=crop&q=80'
-      }
-    };
-
-    // Base prices for furniture types
-    const basePrices = {
-      chair: 299,
-      table: 499,
-      sofa: 899,
-      cabinet: 699,
-      bed: 799,
-      bookshelf: 399,
-      desk: 599,
-      stool: 199
-    };
-
-    // Material price modifiers
-    const materialPriceModifiers = {
-      wood: 0,
-      metal: 50,
-      fabric: 100,
-      leather: 150,
-      glass: 75
-    };
-
-    // Customization selections
+    // Initialize customizations with defaults or session values
     let customizations = {
       finish: 'glossy',
       color: 'natural',
@@ -596,16 +512,118 @@
       quantity: 1
     };
 
+    // Global variable for current price
+    let currentPrice = 0;
+
+    // Function to update price based on customizations
+    function updatePrice() {
+      // Base price from selectedFurniture or default
+      let basePrice = selectedFurniture.price ? parseInt(selectedFurniture.price.replace('₱', '')) : 5000; // Default ₱5000 if not set
+
+      // Customization costs
+      const colorCosts = {
+        natural: 0,
+        dark: 500,
+        light: 300,
+        ebony: 800,
+        cherry: 600,
+        walnut: 700,
+        mahogany: 900,
+        teak: 750,
+        maple: 650
+      };
+
+      const finishCosts = {
+        matte: 0,
+        glossy: 200,
+        satin: 150,
+        'semi-gloss': 250,
+        distressed: 400
+      };
+
+      const sizeCosts = {
+        standard: 0,
+        compact: -300,
+        large: 1000
+      };
+
+      const colorCost = colorCosts[customizations.color] || 0;
+      const finishCost = finishCosts[customizations.finish] || 0;
+      const sizeCost = sizeCosts[customizations.size] || 0;
+
+      currentPrice = basePrice + colorCost + finishCost + sizeCost;
+      const totalPrice = currentPrice * customizations.quantity;
+
+      document.getElementById('itemPrice').textContent = `₱${totalPrice.toLocaleString()}`;
+    }
+
+    // Custom function to get combined material names and icons
+    function getCombinedMaterialInfo(materials, isCombined) {
+      if (!materials || Object.keys(materials).length === 0) {
+        return { names: 'Not selected', icons: '📦', description: 'No material selected.' };
+      }
+      if (!isCombined) {
+        // Single material
+        const mat = materials.all;
+        const materialData = allMaterials[mat.type];
+        return {
+          names: mat.name,
+          icons: materialData ? materialData.icon : '📦',
+          description: mat.description
+        };
+      } else {
+        // Combined
+        const names = Object.keys(materials).map(part => {
+          const key = materials[part];
+          return allMaterials[key] ? allMaterials[key].name : key;
+        }).join(' + ');
+        const icons = Object.keys(materials).map(part => {
+          const key = materials[part];
+          return allMaterials[key] ? allMaterials[key].icon : '📦';
+        }).join(' ');
+        return {
+          names,
+          icons,
+          description: 'Combined materials for different parts.'
+        };
+      }
+    }
+
+    // Furniture image from selectedFurniture.image or fallback
+    const furnitureImageSrc = selectedFurniture.image || 'images/chair.jpg';
+
     // Display selected item
     if (selectedFurniture.name) {
       document.getElementById('itemName').textContent = selectedFurniture.name;
-      document.getElementById('itemMaterial').textContent = `Material: ${selectedMaterial.name || 'Not selected'}`;
-      document.getElementById('itemDescription').textContent = selectedMaterial.description || 'Customize your furniture piece.';
+      const materialInfo = getCombinedMaterialInfo(selectedMaterials, isCombined);
+      document.getElementById('itemImage2').innerHTML = `<div style="font-size: 3rem; display: flex; align-items: center; justify-content: center; height: 100%;">${materialInfo.icons}</div>`;
+      document.getElementById('itemMaterial').textContent = `Material: ${materialInfo.names}`;
+      document.getElementById('itemDescription').textContent = materialInfo.description;
 
-      const initialColor = 'natural';
-      const typeMap = imageMap[selectedFurniture.type] || imageMap.chair;
-      const imgSrc = typeMap[initialColor];
-      document.getElementById('itemImage').innerHTML = `<img src="${imgSrc}" alt="${selectedFurniture.name}" style="width: 100%; height: 100%; object-fit: cover;">`;
+      // Display material parts breakdown for combined materials
+      if (isCombined) {
+        const partsHtml = Object.keys(selectedMaterials).map(part => {
+          const matKey = selectedMaterials[part];
+          const matName = allMaterials[matKey] ? allMaterials[matKey].name : matKey;
+          return `<div><strong>${part.charAt(0).toUpperCase() + part.slice(1)}:</strong> ${matName}</div>`;
+        }).join('');
+        document.getElementById('materialParts').innerHTML = partsHtml;
+      } else {
+        document.getElementById('materialParts').innerHTML = '';
+      }
+
+      // Display shape parts breakdown for combined materials
+      if (isCombined) {
+        const shapesHtml = Object.keys(selectedShapes).map(part => {
+          const shape = selectedShapes[part];
+          return `<div><strong>${part.charAt(0).toUpperCase() + part.slice(1)} Shape:</strong> ${shape}</div>`;
+        }).join('');
+        document.getElementById('shapeParts').innerHTML = shapesHtml;
+      } else {
+        document.getElementById('shapeParts').innerHTML = '';
+      }
+
+      document.getElementById('itemImage').innerHTML = `<img src="${furnitureImageSrc}" alt="${selectedFurniture.name}" style="width: 100%; height: 100%; object-fit: cover;">`;
 
       // Set GIF based on furniture type
       const gifMap = {
@@ -624,7 +642,7 @@
         document.getElementById('itemGif').style.display = 'none';
       }
 
-      customizations.color = initialColor;
+      updatePrice();
     } else {
       // If no selection, redirect back
       alert('No furniture selected. Please go back and select a piece.');
@@ -646,15 +664,9 @@
 
       customizations[category] = value;
 
-      // Update image if color selected
-      if (category === 'color') {
-        const typeMap = imageMap[selectedFurniture.type] || imageMap.chair;
-        const imgSrc = typeMap[value];
-        const img = document.querySelector('#itemImage img');
-        if (img && imgSrc) {
-          img.src = imgSrc;
-        }
-      }
+      // Note: Image remains as the original from craft.html as per user request
+
+      updatePrice();
     }
 
     // Change quantity
@@ -664,6 +676,7 @@
       quantity = Math.max(1, Math.min(10, quantity));
       quantityInput.value = quantity;
       customizations.quantity = quantity;
+      updatePrice();
     }
 
     // Update quantity from input
@@ -672,6 +685,7 @@
       quantity = Math.max(1, Math.min(10, quantity));
       this.value = quantity;
       customizations.quantity = quantity;
+      updatePrice();
     });
 
 
@@ -680,10 +694,26 @@
     function proceedToOrder() {
       // Store customizations in session storage
       sessionStorage.setItem('customizations', JSON.stringify(customizations));
-      const basePrice = basePrices[selectedFurniture.type] || 299;
-      const materialModifier = materialPriceModifiers[selectedMaterial.type] || 0;
-      const totalPrice = (basePrice + materialModifier) * customizations.quantity;
-      sessionStorage.setItem('totalPrice', `$${totalPrice.toLocaleString()}`);
+      const totalPrice = currentPrice * customizations.quantity;
+      sessionStorage.setItem('totalPrice', `₱${totalPrice.toLocaleString()}`);
+      sessionStorage.setItem('customDescription', document.getElementById('customDescription').value);
+      sessionStorage.setItem('selectedShapes', JSON.stringify(selectedShapes));
+
+      // Save proposal to localStorage for admin view
+      const proposal = {
+        customer: userName || 'Anonymous',
+        selectedFurniture,
+        selectedMaterials,
+        selectedShapes,
+        isCombined,
+        customizations,
+        totalPrice: `₱${totalPrice.toLocaleString()}`,
+        customDescription: document.getElementById('customDescription').value,
+        date: new Date().toISOString()
+      };
+      let proposals = JSON.parse(localStorage.getItem('proposals')) || [];
+      proposals.push(proposal);
+      localStorage.setItem('proposals', JSON.stringify(proposals));
 
       // Redirect to shop selection page
       window.location.href = 'shop.html';

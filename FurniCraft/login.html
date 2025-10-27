@@ -364,6 +364,71 @@
       cursor: pointer;
     }
 
+    /* OTP Section */
+    .otp-section {
+      display: none;
+      text-align: center;
+    }
+
+    .otp-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .otp-input {
+      width: 3rem;
+      height: 3rem;
+      text-align: center;
+      font-size: 1.5rem;
+      border: 2px solid rgba(210, 105, 30, 0.5);
+      border-radius: 8px;
+      background: rgba(245, 222, 179, 0.2);
+      color: #333;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .otp-input:focus {
+      border-color: #D2691E;
+      background: rgba(245, 222, 179, 0.3);
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(210, 105, 30, 0.5);
+    }
+
+    .otp-message {
+      font-size: 0.9rem;
+      color: #F5DEB3;
+      margin-bottom: 1rem;
+    }
+
+    .resend-otp {
+      color: #FFD700;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    .resend-otp:hover {
+      color: #FFA500;
+    }
+
+    .copy-otp {
+      color: #FFD700;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      display: inline-block;
+      margin-right: 1rem;
+    }
+
+    .copy-otp:hover {
+      color: #FFA500;
+    }
+
     /* Modal Styles */
     .modal {
       display: none;
@@ -452,12 +517,12 @@
     
     <form id="loginForm">
       <div class="error" id="errorMsg">Please fill out all fields correctly.</div>
-      
+
       <div class="input-group">
         <label for="name"><i class="fas fa-user"></i> Name</label>
         <input type="text" id="name" placeholder="Enter your full name" required>
       </div>
-      
+
       <div class="input-group">
         <label for="mobile"><i class="fas fa-mobile-alt"></i> Mobile Number</label>
         <input type="tel" id="mobile" placeholder="e.g., 09XXXXXXXXX" pattern="[0-9]{11}" required>
@@ -469,9 +534,25 @@
           I agree to the <a href="#" class="terms-link">Terms and Conditions</a>
         </label>
       </div>
-      
-      <button type="submit" id="submitBtn" disabled>Start Crafting</button>
+
+      <button type="submit" id="submitBtn" disabled>Send OTP</button>
     </form>
+
+    <div class="otp-section" id="otpSection">
+      <div class="error" id="otpErrorMsg" style="display: none;">Invalid OTP. Please try again.</div>
+      <p class="otp-message">Enter the 6-digit OTP sent to your mobile number.</p>
+      <div class="otp-inputs">
+        <input type="text" class="otp-input" maxlength="1" id="otp1">
+        <input type="text" class="otp-input" maxlength="1" id="otp2">
+        <input type="text" class="otp-input" maxlength="1" id="otp3">
+        <input type="text" class="otp-input" maxlength="1" id="otp4">
+        <input type="text" class="otp-input" maxlength="1" id="otp5">
+        <input type="text" class="otp-input" maxlength="1" id="otp6">
+      </div>
+      <button type="button" id="verifyOtpBtn">Verify OTP</button>
+      <p class="copy-otp" id="copyOtp">Fill OTP</p>
+      <p class="resend-otp" id="resendOtp">Resend OTP</p>
+    </div>
     
     <p class="footer-tag">Build, Design, Create – With Ease</p>
   </div>
@@ -493,13 +574,20 @@
   </div>
 
   <script>
-    // Enhanced JS: Form Validation + Particles
+    // Enhanced JS: Form Validation + Particles + OTP
     const form = document.getElementById("loginForm");
     const errorMsg = document.getElementById("errorMsg");
     const submitBtn = document.getElementById("submitBtn");
     const termsCheckbox = document.getElementById("termsCheckbox");
     const languageBtn = document.getElementById("languageBtn");
     const languageDropdown = document.getElementById("languageDropdown");
+    const otpSection = document.getElementById("otpSection");
+    const otpErrorMsg = document.getElementById("otpErrorMsg");
+    const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+    const resendOtp = document.getElementById("resendOtp");
+    const otpInputs = document.querySelectorAll(".otp-input");
+
+    let generatedOtp = "123456"; // Simulated OTP for demo
 
     // Create Floating Particles (Furniture Icons)
     function createParticles() {
@@ -515,7 +603,7 @@
         particlesContainer.appendChild(particle);
       }
     }
-    
+
     createParticles(); // Init particles on load
 
     // Language Dropdown Toggle
@@ -549,6 +637,21 @@
       }
     });
 
+    // OTP Input Handling
+    otpInputs.forEach((input, index) => {
+      input.addEventListener("input", function() {
+        if (this.value.length === 1 && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+      });
+      input.addEventListener("keydown", function(e) {
+        if (e.key === "Backspace" && this.value === "" && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+      });
+    });
+
+    // Send OTP
     form.addEventListener("submit", function(e) {
       e.preventDefault();
       const name = document.getElementById("name").value.trim();
@@ -563,16 +666,56 @@
       if (!name || !mobile || !/^[0-9]{11}$/.test(mobile)) {
         errorMsg.style.display = "block";
         errorMsg.textContent = !name ? "Name is required." : !mobile ? "Mobile number is required." : "Mobile must be 11 digits (e.g., 09XXXXXXXXX).";
-      } else {
-        errorMsg.style.display = "none";
-        sessionStorage.setItem("username", name);
-        // Add smooth transition to main
+        return;
+      }
+      errorMsg.style.display = "none";
+      sessionStorage.setItem("username", name);
+
+      // Simulate sending OTP
+      alert(`OTP sent to ${mobile}. (Demo: Use 123456)`);
+      form.style.display = "none";
+      otpSection.style.display = "block";
+      otpInputs[0].focus();
+    });
+
+    // Verify OTP
+    verifyOtpBtn.addEventListener("click", function() {
+      const enteredOtp = Array.from(otpInputs).map(input => input.value).join("");
+      if (enteredOtp === generatedOtp) {
+        otpErrorMsg.style.display = "none";
+        // Proceed to next page
         document.body.style.transition = "opacity 0.5s";
         document.body.style.opacity = "0";
         setTimeout(() => {
-          window.location.href = "main.html";
+          window.location.href = "steps.html";
         }, 500);
+      } else {
+        otpErrorMsg.style.display = "block";
+        otpErrorMsg.textContent = "Invalid OTP. Please try again.";
+        // Clear inputs
+        otpInputs.forEach(input => input.value = "");
+        otpInputs[0].focus();
       }
+    });
+
+    // Fill OTP
+    const copyOtp = document.getElementById("copyOtp");
+    copyOtp.addEventListener("click", function() {
+      const otpDigits = generatedOtp.split("");
+      otpInputs.forEach((input, index) => {
+        input.value = otpDigits[index] || "";
+      });
+      otpInputs[0].focus();
+    });
+
+    // Resend OTP
+    resendOtp.addEventListener("click", function() {
+      const mobile = document.getElementById("mobile").value.trim();
+      alert(`OTP resent to ${mobile}. (Demo: Use 123456)`);
+      generatedOtp = "123456"; // Reset for demo
+      otpErrorMsg.style.display = "none";
+      otpInputs.forEach(input => input.value = "");
+      otpInputs[0].focus();
     });
 
     // Auto-hide error after 5s

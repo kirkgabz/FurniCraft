@@ -330,6 +330,22 @@
       background: linear-gradient(145deg, #FFE4B5, #F0E68C);
     }
 
+    .info-icon {
+      background: none;
+      border: none;
+      color: #6c757d;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .info-icon:hover {
+      background: rgba(0,0,0,0.1);
+      color: #8B4513;
+    }
+
     .modal-actions {
       display: flex;
       gap: 1rem;
@@ -429,56 +445,56 @@
     </div>
 
     <div class="furniture-grid">
-      <div class="furniture-card fade-in" onclick="openMaterialModal('chair', 'Dining Chair', '🪑')">
+      <div class="furniture-card fade-in" onclick="openMaterialModal('chair', 'Dining Chair', furniturePrices.chair, '🪑')">
         <div class="furniture-image">🪑</div>
         <h2>Dining Chair</h2>
         <p>Comfortable and stylish dining chair perfect for any dining room setup. Ergonomic design with customizable upholstery options.</p>
         <button class="craft-button">Customize Chair</button>
       </div>
 
-      <div class="furniture-card fade-in" onclick="openMaterialModal('table', 'Dining Table', '🍽️')">
+      <div class="furniture-card fade-in" onclick="openMaterialModal('table', 'Dining Table', furniturePrices.table, '🍽️')">
         <div class="furniture-image">🍽️</div>
         <h2>Dining Table</h2>
         <p>Beautiful dining table that seats 4-6 people. Available in various sizes and can accommodate extensions for larger gatherings.</p>
         <button class="craft-button">Customize Table</button>
       </div>
 
-      <div class="furniture-card fade-in" onclick="openMaterialModal('sofa', 'Living Room Sofa', '🛋️')">
+      <div class="furniture-card fade-in" onclick="openMaterialModal('sofa', 'Living Room Sofa', furniturePrices.sofa, '🛋️')">
         <div class="furniture-image">🛋️</div>
         <h2>Living Room Sofa</h2>
         <p>Comfortable 3-seater sofa perfect for your living room. Deep seating with premium cushioning and multiple fabric options.</p>
         <button class="craft-button">Customize Sofa</button>
       </div>
 
-      <div class="furniture-card fade-in" onclick="openMaterialModal('cabinet', 'Storage Cabinet', '🗄️')">
+      <div class="furniture-card fade-in" onclick="openMaterialModal('cabinet', 'Storage Cabinet', furniturePrices.cabinet, '🗄️')">
         <div class="furniture-image">🗄️</div>
         <h2>Storage Cabinet</h2>
         <p>Versatile storage cabinet with adjustable shelves. Perfect for bedroom, office, or living room organization needs.</p>
         <button class="craft-button">Customize Cabinet</button>
       </div>
 
-      <div class="furniture-card fade-in" onclick="openMaterialModal('bed', 'Queen Bed Frame', '🛏️')">
+      <div class="furniture-card fade-in" onclick="openMaterialModal('bed', 'Queen Bed Frame', furniturePrices.bed, '🛏️')">
         <div class="furniture-image">🛏️</div>
         <h2>Queen Bed Frame</h2>
         <p>Sturdy and elegant queen-size bed frame with headboard. Available with storage drawers or simple modern design.</p>
         <button class="craft-button">Customize Bed</button>
       </div>
 
-      <div class="furniture-card fade-in" onclick="openMaterialModal('bookshelf', 'Bookshelf', '📚')">
+      <div class="furniture-card fade-in" onclick="openMaterialModal('bookshelf', 'Bookshelf', furniturePrices.bookshelf, '📚')">
         <div class="furniture-image">📚</div>
         <h2>Bookshelf</h2>
         <p>5-tier bookshelf perfect for displaying books, decor, and collectibles. Adjustable shelves for maximum flexibility.</p>
         <button class="craft-button">Customize Bookshelf</button>
       </div>
 
-      <div class="furniture-card fade-in" onclick="openMaterialModal('desk', 'Office Desk', '💻')">
+      <div class="furniture-card fade-in" onclick="openMaterialModal('desk', 'Office Desk', furniturePrices.desk, '💻')">
         <div class="furniture-image">💻</div>
         <h2>Office Desk</h2>
         <p>Modern office desk with cable management and optional drawers. Perfect for home office or study space.</p>
         <button class="craft-button">Customize Desk</button>
       </div>
 
-      <div class="furniture-card fade-in" onclick="openMaterialModal('stool', 'Bar Stool', '🪑')">
+      <div class="furniture-card fade-in" onclick="openMaterialModal('stool', 'Bar Stool', furniturePrices.stool, '🪑')">
         <div class="furniture-image">🪑</div>
         <h2>Bar Stool</h2>
         <p>Contemporary bar stool with adjustable height. Perfect for kitchen islands or home bars with comfortable seating.</p>
@@ -512,59 +528,32 @@
         </div>
       </div>
 
-      <h3 style="margin-bottom: 1rem; color: #495057;">All Materials:</h3>
+      <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+          <input type="checkbox" id="combinedMaterials" onchange="toggleCombinedMaterials()">
+          <span>Use combined materials</span>
+        </label>
+      </div>
+
+      <div id="partsSection" style="display: none; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #495057;">Assign Materials to Parts:</h3>
+        <div id="partsGrid" style="display: grid; gap: 1rem;"></div>
+      </div>
+
+      <div id="singleMaterialSection">
+        <h3 style="margin-bottom: 1rem; color: #495057;">All Materials:</h3>
+      </div>
       <div id="cautionMessage" style="display: none; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; color: #856404;">
         <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
         <strong>Caution:</strong> This material may not be the best choice for this furniture type. It could affect durability, comfort, or aesthetics. Consider a recommended material for optimal results.
       </div>
-      <div class="material-grid">
-        <div class="material-card" onclick="selectMaterial('oak', 'Oak Wood', 'Premium hardwood with rich grain patterns', '$0')">
-          <div class="material-icon">🌳</div>
-          <h3>Oak Wood</h3>
-          <p>Premium hardwood with rich grain patterns</p>
-        </div>
-
-        <div class="material-card" onclick="selectMaterial('walnut', 'Walnut Wood', 'Luxurious dark wood with beautiful figuring', '+$150')">
-          <div class="material-icon">🪵</div>
-          <h3>Walnut Wood</h3>
-          <p>Luxurious dark wood with beautiful figuring</p>
-        </div>
-
-        <div class="material-card" onclick="selectMaterial('pine', 'Pine Wood', 'Lightweight and affordable softwood', '-$50')">
-          <div class="material-icon">🌲</div>
-          <h3>Pine Wood</h3>
-          <p>Lightweight and affordable softwood</p>
-        </div>
-
-        <div class="material-card" onclick="selectMaterial('steel', 'Stainless Steel', 'Modern and durable metal construction', '+$200')">
-          <div class="material-icon">⚙️</div>
-          <h3>Stainless Steel</h3>
-          <p>Modern and durable metal construction</p>
-        </div>
-
-        <div class="material-card" onclick="selectMaterial('aluminum', 'Aluminum', 'Lightweight metal with sleek finish', '+$100')">
-          <div class="material-icon">🔧</div>
-          <h3>Aluminum</h3>
-          <p>Lightweight metal with sleek finish</p>
-        </div>
-
-        <div class="material-card" onclick="selectMaterial('fabric', 'Premium Fabric', 'Soft and comfortable upholstery', '+$75')">
-          <div class="material-icon">🛏️</div>
-          <h3>Premium Fabric</h3>
-          <p>Soft and comfortable upholstery</p>
-        </div>
-
-        <div class="material-card" onclick="selectMaterial('leather', 'Genuine Leather', 'Luxurious genuine leather upholstery', '+$300')">
-          <div class="material-icon">🪑</div>
-          <h3>Genuine Leather</h3>
-          <p>Luxurious genuine leather upholstery</p>
-        </div>
-
-        <div class="material-card" onclick="selectMaterial('plastic', 'High-Grade Plastic', 'Durable and easy to clean', '-$25')">
-          <div class="material-icon">🪟</div>
-          <h3>High-Grade Plastic</h3>
-          <p>Durable and easy to clean</p>
-        </div>
+      <div id="gradesDisplay" style="display: none; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; color: #155724;">
+        <strong>Material Grades:</strong><br>
+        <span id="durabilityGrade"></span><br>
+        <span id="qualityGrade"></span>
+      </div>
+      <div id="allMaterialsGrid" class="material-grid">
+        <!-- All materials will be populated here dynamically -->
       </div>
 
       <div class="modal-actions">
@@ -582,35 +571,141 @@
     }
 
     let selectedFurniture = {};
-    let selectedMaterial = {};
+    let selectedMaterials = {}; // { part: materialKey } or { all: materialKey }
+    let selectedShapes = {}; // { part: shape }
+    let isCombined = false;
+
+    // Furniture prices
+    const furniturePrices = {
+      chair: '₱2500',
+      table: '₱5000',
+      sofa: '₱8000',
+      cabinet: '₱4000',
+      bed: '₱6000',
+      bookshelf: '₱3500',
+      desk: '₱4500',
+      stool: '₱1500'
+    };
+
+    // Furniture parts based on type
+    const furnitureParts = {
+      chair: ['Seat', 'Back', 'Legs'],
+      table: ['Top', 'Legs'],
+      sofa: ['Frame', 'Cushions', 'Arms'],
+      cabinet: ['Frame', 'Doors', 'Shelves'],
+      bed: ['Frame', 'Headboard'],
+      bookshelf: ['Frame', 'Shelves'],
+      desk: ['Top', 'Legs', 'Drawers'],
+      stool: ['Seat', 'Legs']
+    };
 
     // Material recommendations based on furniture type
     const materialRecommendations = {
-      chair: ['fabric', 'leather', 'oak'],
-      table: ['oak', 'walnut', 'pine'],
+      chair: ['fabric', 'leather', 'narra'],
+      table: ['narra', 'mahogany', 'aninapla'],
       sofa: ['fabric', 'leather'],
-      cabinet: ['oak', 'pine', 'walnut'],
-      bed: ['oak', 'pine', 'fabric'],
-      bookshelf: ['oak', 'pine', 'walnut'],
-      desk: ['oak', 'walnut', 'steel'],
+      cabinet: ['narra', 'aninapla', 'mahogany'],
+      bed: ['narra', 'aninapla', 'fabric'],
+      bookshelf: ['narra', 'aninapla', 'mahogany'],
+      desk: ['narra', 'mahogany', 'steel'],
       stool: ['fabric', 'leather', 'steel']
     };
 
     // All materials data
     const allMaterials = {
-      oak: { name: 'Oak Wood', description: 'Premium hardwood with rich grain patterns', priceModifier: '$0', icon: '🌳' },
-      walnut: { name: 'Walnut Wood', description: 'Luxurious dark wood with beautiful figuring', priceModifier: '+$150', icon: '🪵' },
-      pine: { name: 'Pine Wood', description: 'Lightweight and affordable softwood', priceModifier: '-$50', icon: '🌲' },
-      steel: { name: 'Stainless Steel', description: 'Modern and durable metal construction', priceModifier: '+$200', icon: '⚙️' },
-      aluminum: { name: 'Aluminum', description: 'Lightweight metal with sleek finish', priceModifier: '+$100', icon: '🔧' },
-      fabric: { name: 'Premium Fabric', description: 'Soft and comfortable upholstery', priceModifier: '+$75', icon: '🛏️' },
-      leather: { name: 'Genuine Leather', description: 'Luxurious genuine leather upholstery', priceModifier: '+$300', icon: '🪑' },
-      plastic: { name: 'High-Grade Plastic', description: 'Durable and easy to clean', priceModifier: '-$25', icon: '🪟' }
+      narra: { name: 'Narra Wood', description: 'Pterocarpus indicus, a hardwood tree native to Southeast Asia, particularly abundant in the Philippines. Known for its rich reddish-brown heartwood and resistance to decay.', priceModifier: '+$200', icon: '🌳', durability: 90, quality: 95 },
+      aninapla: { name: 'Aninapla Wood', description: 'Artocarpus blancoi, an endemic hardwood species native to the Philippines, found in primary forests. Features dark brown wood with excellent natural durability and termite resistance.', priceModifier: '+$100', icon: '🌲', durability: 85, quality: 90 },
+      mahogany: { name: 'Mahogany Wood', description: 'Swietenia mahagoni, originally from the Caribbean but widely cultivated in the Philippines. Features deep red tones, fine grain, and is valued for its workability and aesthetic appeal.', priceModifier: '+$150', icon: '🪵', durability: 88, quality: 92 },
+      steel: { name: 'Stainless Steel', description: 'An alloy primarily composed of iron and chromium (minimum 10.5% chromium content). Manufactured worldwide through industrial processes involving smelting and refining of iron ore.', priceModifier: '+$200', icon: '⚙️', durability: 95, quality: 85 },
+      aluminum: { name: 'Aluminum', description: 'Chemical element with symbol Al and atomic number 13. Extracted from bauxite ore through the Bayer process, primarily mined in Australia, China, and Guinea.', priceModifier: '+$100', icon: '🔧', durability: 80, quality: 80 },
+      fabric: { name: 'Premium Fabric', description: 'Textile materials composed of natural fibers (cotton, wool, silk) or synthetic polymers (polyester, nylon). Produced through weaving or knitting processes worldwide, with major production centers in China and India.', priceModifier: '+$75', icon: '🛏️', durability: 60, quality: 70 },
+      leather: { name: 'Genuine Leather', description: 'Tanned animal hide, primarily from cattle (Bos taurus). Produced through tanning processes using vegetable tannins or chromium salts, with major production in Brazil, India, and Italy.', priceModifier: '+$300', icon: '🪑', durability: 75, quality: 90 },
+      plastic: { name: 'High-Grade Plastic', description: 'Synthetic polymer materials derived from petrochemicals, primarily polyethylene or polypropylene. Manufactured through polymerization processes in industrial facilities worldwide.', priceModifier: '-$25', icon: '🪟', durability: 70, quality: 65 }
+    };
+
+    // Part images for combined materials mode (using actual photos)
+    const partImages = {
+      chair: {
+        Seat: 'images/chair_seat.jpg',
+        Back: 'images/chair_back.jpg',
+        Legs: 'images/chair_legs.jpg'
+      },
+      table: {
+        Top: 'images/table_top.jpg',
+        Legs: 'images/table_legs.jpg'
+      },
+      sofa: {
+        Frame: 'images/sofa_frame.jpg',
+        Cushions: 'images/sofa_cushion.jpg',
+        Arms: 'images/sofa_arms.jpg'
+      },
+      cabinet: {
+        Frame: 'images/cabinet_frame.jpg',
+        Doors: 'images/cabinet_doors.jpg',
+        Shelves: 'images/cabinet_shelves.jpg'
+      },
+      bed: {
+        Frame: 'images/bed_frame.jpg',
+        Headboard: 'images/bed_headboard.jpg'
+      },
+      bookshelf: {
+        Frame: 'images/bookshelf_frame.jpg',
+        Shelves: 'images/bookshelf_shelves.jpg'
+      },
+      desk: {
+        Top: 'images/desk_top.jpg',
+        Legs: 'images/desk_legs.jpg',
+        Drawers: 'images/desk_drawer.jpg'
+      },
+      stool: {
+        Seat: 'images/stool_seat.jpg',
+        Legs: 'images/stool_legs.jpg'
+      }
+    };
+
+    // Shape options for each furniture part
+    const partShapes = {
+      chair: {
+        Seat: ['Square', 'Round', 'Oval'],
+        Back: ['Straight', 'Curved', 'Winged'],
+        Legs: ['Straight', 'Curved', 'Tapered']
+      },
+      table: {
+        Top: ['Rectangular', 'Round', 'Square'],
+        Legs: ['Straight', 'Curved', 'Tapered']
+      },
+      sofa: {
+        Frame: ['Rectangular', 'L-shaped', 'Sectional'],
+        Cushions: ['Square', 'Round', 'Rectangular'],
+        Arms: ['Straight', 'Curved', 'Rolled']
+      },
+      cabinet: {
+        Frame: ['Rectangular', 'Square'],
+        Doors: ['Flat', 'Paneled', 'Glass'],
+        Shelves: ['Fixed', 'Adjustable']
+      },
+      bed: {
+        Frame: ['Platform', 'Storage', 'Canopy'],
+        Headboard: ['Upholstered', 'Wooden', 'Tufted']
+      },
+      bookshelf: {
+        Frame: ['Open', 'Enclosed'],
+        Shelves: ['Fixed', 'Adjustable']
+      },
+      desk: {
+        Top: ['Rectangular', 'L-shaped', 'Corner'],
+        Legs: ['Straight', 'Tapered', 'X-shaped'],
+        Drawers: ['None', 'Single', 'Multiple']
+      },
+      stool: {
+        Seat: ['Square', 'Round', 'Oval'],
+        Legs: ['Straight', 'Curved', 'Tapered']
+      }
     };
 
     // Open material selection modal
     function openMaterialModal(type, name, price, icon) {
-      selectedFurniture = { type, name, price, icon };
+      selectedFurniture = { type, name, price, icon, image: `images/${type}.jpg` };
       document.getElementById('modalTitle').textContent = `Customize ${name}`;
       document.getElementById('selectedFurnitureIcon').textContent = icon;
       document.getElementById('selectedFurnitureName').textContent = name;
@@ -629,11 +724,27 @@
           card.onclick = () => selectMaterial(materialKey, material.name, material.description, material.priceModifier);
           card.innerHTML = `
             <div class="material-icon">${material.icon}</div>
-            <h3>${material.name}</h3>
-            <p>${material.description}</p>
+            <h3>${material.name} <button class="info-icon" onclick="showMaterialInfo(event, '${materialKey}')"><i class="fas fa-info-circle"></i></button></h3>
             <div style="position: absolute; top: 10px; right: 10px; color: #FFD700; font-size: 1.2rem;"><i class="fas fa-star"></i></div>
           `;
           recommendationsGrid.appendChild(card);
+        }
+      });
+
+      // Populate all materials excluding recommended
+      const allMaterialsGrid = document.getElementById('allMaterialsGrid');
+      allMaterialsGrid.innerHTML = '';
+      const recommendedSet = new Set(recommendedMaterials);
+      Object.entries(allMaterials).forEach(([key, material]) => {
+        if (!recommendedSet.has(key)) {
+          const card = document.createElement('div');
+          card.className = 'material-card';
+          card.onclick = () => selectMaterial(key, material.name, material.description, material.priceModifier);
+          card.innerHTML = `
+            <div class="material-icon">${material.icon}</div>
+            <h3>${material.name} <button class="info-icon" onclick="showMaterialInfo(event, '${key}')"><i class="fas fa-info-circle"></i></button></h3>
+          `;
+          allMaterialsGrid.appendChild(card);
         }
       });
 
@@ -647,46 +758,65 @@
       document.querySelectorAll('.material-card').forEach(card => {
         card.classList.remove('selected');
       });
-      selectedMaterial = {};
-      // Hide caution message
+      selectedMaterials = {};
+      isCombined = false;
+      document.getElementById('combinedMaterials').checked = false;
+      // Hide sections
+      document.getElementById('partsSection').style.display = 'none';
+      document.getElementById('recommendationsSection').style.display = 'block';
+      document.getElementById('singleMaterialSection').style.display = 'block';
+      document.getElementById('allMaterialsGrid').style.display = 'block';
+      // Hide caution message and grades display
       document.getElementById('cautionMessage').style.display = 'none';
+      document.getElementById('gradesDisplay').style.display = 'none';
     }
 
     // Select material
     function selectMaterial(type, name, description, priceModifier) {
-      // Remove previous selection
-      document.querySelectorAll('.material-card').forEach(card => {
-        card.classList.remove('selected');
-      });
-
-      // Add selection to clicked card
-      event.target.closest('.material-card').classList.add('selected');
-
-      selectedMaterial = { type, name, description, priceModifier };
-
-      // Check if material is recommended for the selected furniture
-      const recommendedMaterials = materialRecommendations[selectedFurniture.type] || [];
-      const isRecommended = recommendedMaterials.includes(type);
-
-      // Show or hide caution message
-      const cautionMessage = document.getElementById('cautionMessage');
-      if (isRecommended) {
-        cautionMessage.style.display = 'none';
+      if (isCombined) {
+        // In combined mode, material selection is handled by part dropdowns
+        return;
       } else {
-        cautionMessage.style.display = 'block';
+        // Single selection mode
+        // Remove previous selection
+        document.querySelectorAll('.material-card').forEach(card => {
+          card.classList.remove('selected');
+        });
+
+        // Add selection to clicked card
+        event.target.closest('.material-card').classList.add('selected');
+
+        selectedMaterials = { all: { type, name, description, priceModifier } };
+
+        // Check if material is recommended for the selected furniture
+        const recommendedMaterials = materialRecommendations[selectedFurniture.type] || [];
+        const isRecommended = recommendedMaterials.includes(type);
+
+        // Show or hide caution message
+        const cautionMessage = document.getElementById('cautionMessage');
+        if (isRecommended) {
+          cautionMessage.style.display = 'none';
+        } else {
+          cautionMessage.style.display = 'block';
+        }
+
+        // Hide grades display
+        document.getElementById('gradesDisplay').style.display = 'none';
       }
     }
 
     // Proceed to customization
     function proceedToCustomization() {
-      if (!selectedMaterial.type) {
+      if (Object.keys(selectedMaterials).length === 0) {
         alert('Please select a material first!');
         return;
       }
 
       // Store selections in session storage for next page
       sessionStorage.setItem('selectedFurniture', JSON.stringify(selectedFurniture));
-      sessionStorage.setItem('selectedMaterial', JSON.stringify(selectedMaterial));
+      sessionStorage.setItem('selectedMaterials', JSON.stringify(selectedMaterials));
+      sessionStorage.setItem('selectedShapes', JSON.stringify(selectedShapes));
+      sessionStorage.setItem('isCombined', isCombined);
 
       // Close modal and redirect
       closeMaterialModal();
@@ -721,6 +851,121 @@
       card.style.animationPlayState = 'paused';
       observer.observe(card);
     });
+
+    // Toggle combined materials mode
+    function toggleCombinedMaterials() {
+      isCombined = document.getElementById('combinedMaterials').checked;
+      const partsSection = document.getElementById('partsSection');
+      const partsGrid = document.getElementById('partsGrid');
+      const recommendationsSection = document.getElementById('recommendationsSection');
+      const singleMaterialSection = document.getElementById('singleMaterialSection');
+      const allMaterialsGrid = document.getElementById('allMaterialsGrid');
+      const gradesDisplay = document.getElementById('gradesDisplay');
+      const cautionMessage = document.getElementById('cautionMessage');
+
+      if (isCombined) {
+        // Show parts section with dropdowns
+        partsSection.style.display = 'block';
+        recommendationsSection.style.display = 'none';
+        singleMaterialSection.style.display = 'none';
+        allMaterialsGrid.style.display = 'none';
+        cautionMessage.style.display = 'none';
+
+        // Populate parts dropdowns
+        partsGrid.innerHTML = '';
+        const parts = furnitureParts[selectedFurniture.type] || [];
+        parts.forEach(part => {
+          const partDiv = document.createElement('div');
+          partDiv.style.display = 'flex';
+          partDiv.style.alignItems = 'center';
+          partDiv.style.gap = '1rem';
+          partDiv.innerHTML = `
+            <img src="${partImages[selectedFurniture.type][part]}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #dee2e6;">
+            <div style="flex: 1;">
+              <label style="font-weight: 500;">${part}:</label>
+              <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <select id="shape-${part}" onchange="updatePartShape('${part}')" style="flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid #dee2e6;">
+                  <option value="">Select Shape</option>
+                  ${partShapes[selectedFurniture.type][part].map(shape => `<option value="${shape}">${shape}</option>`).join('')}
+                </select>
+                <select id="part-${part}" onchange="updatePartMaterial('${part}')" style="flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid #dee2e6;">
+                  <option value="">Select Material</option>
+                  ${Object.entries(allMaterials).map(([key, material]) => `<option value="${key}">${material.name}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+          `;
+          partsGrid.appendChild(partDiv);
+        });
+
+        // Clear single selections
+        document.querySelectorAll('.material-card').forEach(card => {
+          card.classList.remove('selected');
+        });
+        selectedMaterials = {};
+        gradesDisplay.style.display = 'none';
+      } else {
+        // Show material grids
+        partsSection.style.display = 'none';
+        recommendationsSection.style.display = 'block';
+        singleMaterialSection.style.display = 'block';
+        allMaterialsGrid.style.display = 'block';
+
+        // Clear selections
+        selectedMaterials = {};
+        document.querySelectorAll('.material-card').forEach(card => {
+          card.classList.remove('selected');
+        });
+        gradesDisplay.style.display = 'none';
+        cautionMessage.style.display = 'none';
+      }
+    }
+
+    // Update shape for a specific part in combined mode
+    function updatePartShape(part) {
+      const select = document.getElementById(`shape-${part}`);
+      const shape = select.value;
+      if (shape) {
+        selectedShapes[part] = shape;
+      } else {
+        delete selectedShapes[part];
+      }
+    }
+
+    // Update material for a specific part in combined mode
+    function updatePartMaterial(part) {
+      const select = document.getElementById(`part-${part}`);
+      const materialKey = select.value;
+      if (materialKey) {
+        selectedMaterials[part] = materialKey;
+      } else {
+        delete selectedMaterials[part];
+      }
+
+      // Calculate and display combined grades
+      const selectedParts = Object.keys(selectedMaterials);
+      if (selectedParts.length > 0) {
+        const avgDurability = Math.round(selectedParts.reduce((sum, p) => sum + allMaterials[selectedMaterials[p]].durability, 0) / selectedParts.length);
+        const avgQuality = Math.round(selectedParts.reduce((sum, p) => sum + allMaterials[selectedMaterials[p]].quality, 0) / selectedParts.length);
+
+        document.getElementById('durabilityGrade').textContent = `Durability: ${avgDurability}/100`;
+        document.getElementById('qualityGrade').textContent = `Quality: ${avgQuality}/100`;
+        document.getElementById('gradesDisplay').style.display = 'block';
+      } else {
+        document.getElementById('gradesDisplay').style.display = 'none';
+      }
+    }
+
+    // Show material info
+    function showMaterialInfo(event, materialKey) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const material = allMaterials[materialKey];
+      if (material) {
+        alert(`${material.name}\n\n${material.description}`);
+      }
+    }
 
     // Close modal when clicking outside
     document.getElementById('materialModal').addEventListener('click', function(event) {
