@@ -864,9 +864,9 @@
       const cautionMessage = document.getElementById('cautionMessage');
 
       if (isCombined) {
-        // Show parts section with dropdowns
+        // Show parts section with dropdowns and keep recommendations
         partsSection.style.display = 'block';
-        recommendationsSection.style.display = 'none';
+        recommendationsSection.style.display = 'block';
         singleMaterialSection.style.display = 'none';
         allMaterialsGrid.style.display = 'none';
         cautionMessage.style.display = 'none';
@@ -874,6 +874,7 @@
         // Populate parts dropdowns
         partsGrid.innerHTML = '';
         const parts = furnitureParts[selectedFurniture.type] || [];
+        const recommendedMaterials = materialRecommendations[selectedFurniture.type] || [];
         parts.forEach(part => {
           const partDiv = document.createElement('div');
           partDiv.style.display = 'flex';
@@ -890,8 +891,12 @@
                 </select>
                 <select id="part-${part}" onchange="updatePartMaterial('${part}')" style="flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid #dee2e6;">
                   <option value="">Select Material</option>
-                  ${Object.entries(allMaterials).map(([key, material]) => `<option value="${key}">${material.name}</option>`).join('')}
+                  ${Object.entries(allMaterials).map(([key, material]) => `<option value="${key}" ${recommendedMaterials.includes(key) ? 'style="font-weight: bold;"' : ''}>${material.name}${recommendedMaterials.includes(key) ? ' ★' : ''}</option>`).join('')}
                 </select>
+              </div>
+              <div id="caution-${part}" style="display: none; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 0.5rem; margin-top: 0.5rem; color: #856404; font-size: 0.8rem;">
+                <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+                <strong>Caution:</strong> This material may not be the best choice for this part. It could affect durability, comfort, or aesthetics. Consider a recommended material for optimal results.
               </div>
             </div>
           `;
@@ -940,6 +945,20 @@
         selectedMaterials[part] = materialKey;
       } else {
         delete selectedMaterials[part];
+      }
+
+      // Check if material is recommended for the selected furniture
+      const recommendedMaterials = materialRecommendations[selectedFurniture.type] || [];
+      const isRecommended = recommendedMaterials.includes(materialKey);
+
+      // Show or hide caution message for this part
+      const cautionDiv = document.getElementById(`caution-${part}`);
+      if (cautionDiv) {
+        if (materialKey && !isRecommended) {
+          cautionDiv.style.display = 'block';
+        } else {
+          cautionDiv.style.display = 'none';
+        }
       }
 
       // Calculate and display combined grades

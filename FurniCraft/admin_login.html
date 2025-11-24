@@ -355,32 +355,38 @@
   <div class="login-box">
     <div class="login-header">
       <i class="fas fa-hammer"></i>
-      <h1>FurniCraft Admin</h1>
-      <p class="tagline">Worker Access Portal</p>
+      <h1 data-i18n="admin_login_title">FurniCraft Admin</h1>
+      <p class="tagline" data-i18n="worker_access_portal">Worker Access Portal</p>
+      <!-- Language Button -->
+      <button class="language-btn" id="languageBtn" style="position: absolute; top: 20px; right: 20px; height: 30px; width: 30px; padding: 0; display: flex; justify-content: center; align-items: center;"><i class="fas fa-bars"></i></button>
+      <div class="language-dropdown" id="languageDropdown" style="position: absolute; top: 60px; right: 20px;">
+        <div class="language-option" data-lang="en" data-i18n="english">English</div>
+        <div class="language-option" data-lang="fil" data-i18n="filipino">Filipino</div>
+      </div>
     </div>
     
     <div id="loginForm">
-      <div class="error" id="loginError">Invalid username or password.</div>
-      <div class="success" id="loginSuccess">Login successful! Redirecting...</div>
+      <div class="error" id="loginError" data-i18n="invalid_username_password">Invalid username or password.</div>
+      <div class="success" id="loginSuccess" data-i18n="login_successful">Login successful! Redirecting...</div>
 
       <div class="input-group">
-        <label for="loginUsername"><i class="fas fa-user"></i> Username</label>
-        <input type="text" id="loginUsername" placeholder="Enter admin username" required>
+        <label for="loginUsername"><i class="fas fa-user"></i> <span data-i18n="username">Username</span></label>
+        <input type="text" id="loginUsername" placeholder="" data-i18n-placeholder="enter_admin_username" required>
       </div>
 
       <div class="input-group">
-        <label for="loginPassword"><i class="fas fa-lock"></i> Password</label>
-        <input type="password" id="loginPassword" placeholder="Enter password" required>
+        <label for="loginPassword"><i class="fas fa-lock"></i> <span data-i18n="password">Password</span></label>
+        <input type="password" id="loginPassword" placeholder="" data-i18n-placeholder="enter_password" required>
       </div>
 
-      <button type="submit" id="loginBtn">Login</button>
+      <button type="submit" id="loginBtn" data-i18n="login">Login</button>
     </div>
     
 
 
-    <div class="otp-section" id="otpSection">
-      <div class="error" id="otpError" style="display: none;">Invalid OTP. Please try again.</div>
-      <p class="otp-message">Enter the 6-digit OTP sent to your registered email.</p>
+      <div class="otp-section" id="otpSection">
+      <div class="error" id="otpError" style="display: none;" data-i18n="invalid_otp">Invalid OTP. Please try again.</div>
+      <p class="otp-message" data-i18n="enter_otp_sent_email">Enter the 6-digit OTP sent to your registered email.</p>
       <div class="otp-inputs">
         <input type="text" class="otp-input" maxlength="1" id="otp1">
         <input type="text" class="otp-input" maxlength="1" id="otp2">
@@ -389,13 +395,13 @@
         <input type="text" class="otp-input" maxlength="1" id="otp5">
         <input type="text" class="otp-input" maxlength="1" id="otp6">
       </div>
-      <button type="button" id="verifyOtpBtn">Verify OTP</button>
-      <p class="copy-otp" id="copyOtp">Fill OTP</p>
-      <p class="resend-otp" id="resendOtp">Resend OTP</p>
+      <button type="button" id="verifyOtpBtn" data-i18n="verify_otp">Verify OTP</button>
+      <p class="copy-otp" id="copyOtp" data-i18n="fill_otp">Fill OTP</p>
+      <p class="resend-otp" id="resendOtp" data-i18n="resend_otp">Resend OTP</p>
     </div>
 
-    <p class="footer-tag">Manage, Monitor, Master – With Precision</p>
-    <p class="back-link" onclick="window.location.href='login.html'">Back to User Login</p>
+    <p class="footer-tag" data-i18n="admin_footer_tag">Manage, Monitor, Master – With Precision</p>
+    <p class="back-link" onclick="window.location.href='login.html'" data-i18n="back_to_user_login">Back to User Login</p>
   </div>
 
   <script>
@@ -541,5 +547,36 @@
       }
     }, 5000);
   </script>
+  <script src="i18n.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof applyTranslations === "function") {
+        applyTranslations(getCurrentLanguage());
+      }
+      const languageOptions = document.querySelectorAll(".language-option");
+      languageOptions.forEach(option => {
+        option.addEventListener("click", function() {
+          const lang = this.getAttribute("data-lang");
+          if (typeof setLanguage === "function") {
+            setLanguage(lang);
+            applyTranslations(lang);
+          }
+          document.getElementById("languageDropdown").classList.remove("show");
+        });
+      });
+      const languageBtn = document.getElementById("languageBtn");
+      const languageDropdown = document.getElementById("languageDropdown");
+      languageBtn.addEventListener("click", () => {
+        languageDropdown.classList.toggle("show");
+      });
+      document.addEventListener("click", event => {
+        if (!languageDropdown.contains(event.target) && !languageBtn.contains(event.target)) {
+          languageDropdown.classList.remove("show");
+        }
+      });
+    });
+  </script>
+</body>
+</html>
 </body>
 </html>

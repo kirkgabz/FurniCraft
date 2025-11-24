@@ -255,6 +255,23 @@
       font-style: italic;
     }
 
+    /* Forgot Password */
+    .forgot-password {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .forgot-password a {
+      color: #FFD700;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .forgot-password a:hover {
+      color: #FFA500;
+    }
+
     /* Tab Buttons */
     .tab-buttons {
       display: flex;
@@ -534,42 +551,45 @@
   <!-- Language Button -->
   <button class="language-btn" id="languageBtn"><i class="fas fa-bars"></i></button>
   <div class="language-dropdown" id="languageDropdown">
-    <div class="language-option" data-lang="en">English</div>
+    <div class="language-option" data-lang="en" data-i18n="english">English</div>
     <div class="language-option" data-lang="es">Español</div>
     <div class="language-option" data-lang="fr">Français</div>
     <div class="language-option" data-lang="de">Deutsch</div>
     <div class="language-option" data-lang="it">Italiano</div>
+    <div class="language-option" data-lang="fil" data-i18n="filipino">Filipino</div>
   </div>
   
   <div class="login-box">
     <div class="login-header">
       <i class="fas fa-hammer"></i>
-      <h1>Welcome to FurniCraft</h1>
-      <p class="tagline">Craft Your Perfect Furniture</p>
+      <h1 data-i18n="welcome">Welcome to FurniCraft</h1>
+      <p class="tagline" data-i18n="tagline">Craft Your Perfect Furniture</p>
     </div>
 
     <!-- Tab Buttons -->
     <div class="tab-buttons">
-      <button class="tab-btn active" id="loginTab">Login</button>
-      <button class="tab-btn" id="signupTab">Sign Up</button>
+      <button class="tab-btn active" id="loginTab" data-i18n="login">Login</button>
+      <button class="tab-btn" id="signupTab" data-i18n="signup">Sign Up</button>
     </div>
 
     <!-- Login Form -->
     <form id="loginForm" class="form-section">
-      <div class="error" id="loginErrorMsg">Please fill out all fields correctly.</div>
+      <div class="error" id="loginErrorMsg" data-i18n="fill_fields_error">Please fill out all fields correctly.</div>
 
       <div class="input-group">
-        <label for="loginName"><i class="fas fa-user"></i> Name</label>
-        <input type="text" id="loginName" placeholder="Enter your full name" required>
+        <label for="loginName" data-i18n="name"><i class="fas fa-user"></i> Name</label>
+        <input type="text" id="loginName" placeholder="" data-i18n="enter_full_name" required>
       </div>
 
       <div class="input-group">
-        <label for="loginMobile"><i class="fas fa-mobile-alt"></i> Mobile Number</label>
+        <label for="loginMobile" data-i18n="mobile_number"><i class="fas fa-mobile-alt"></i> Mobile Number</label>
         <input type="tel" id="loginMobile" placeholder="e.g., 09XXXXXXXXX" pattern="[0-9]{11}" required>
       </div>
 
-      <button type="submit" id="loginSubmitBtn">Send OTP</button>
+      <button type="submit" id="loginSubmitBtn" data-i18n="send_otp">Send OTP</button>
+      <p class="forgot-password"><a href="#" id="forgotPassword" data-i18n="forgot_password">Forgot Password?</a></p>
     </form>
+
 
     <!-- Sign Up Form -->
     <form id="signupForm" class="form-section" style="display: none;">
@@ -850,6 +870,13 @@
       otpErrorMsg.style.display = "none";
       otpInputs.forEach(input => input.value = "");
       otpInputs[0].focus();
+    });
+
+    // Forgot Password Handler
+    const forgotPassword = document.getElementById("forgotPassword");
+    forgotPassword.addEventListener("click", function(e) {
+      e.preventDefault();
+      alert("Forgot Password functionality is not implemented in this demo. Please contact support.");
     });
 
     // Terms Modal Handlers
