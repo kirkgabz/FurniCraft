@@ -382,44 +382,11 @@
 
         <div class="option-group">
           <label>Color:</label>
-          <div class="option-grid">
-            <div class="option-card selected" data-category="color" onclick="selectOption('color', 'natural')">
-              <div class="color-option" style="background: #D2B48C;"></div>
-              <span>Natural</span>
-            </div>
-            <div class="option-card" data-category="color" onclick="selectOption('color', 'dark')">
-              <div class="color-option" style="background: #654321;"></div>
-              <span>Dark Brown</span>
-            </div>
-            <div class="option-card" data-category="color" onclick="selectOption('color', 'light')">
-              <div class="color-option" style="background: #F5DEB3;"></div>
-              <span>Light Oak</span>
-            </div>
-            <div class="option-card" data-category="color" onclick="selectOption('color', 'ebony')">
-              <div class="color-option" style="background: #2F1B14;"></div>
-              <span>Ebony</span>
-            </div>
-            <div class="option-card" data-category="color" onclick="selectOption('color', 'cherry')">
-              <div class="color-option" style="background: #8B0000;"></div>
-              <span>Cherry</span>
-            </div>
-            <div class="option-card" data-category="color" onclick="selectOption('color', 'walnut')">
-              <div class="color-option" style="background: #3C2F2F;"></div>
-              <span>Walnut</span>
-            </div>
-            <div class="option-card" data-category="color" onclick="selectOption('color', 'mahogany')">
-              <div class="color-option" style="background: #C04000;"></div>
-              <span>Mahogany</span>
-            </div>
-            <div class="option-card" data-category="color" onclick="selectOption('color', 'teak')">
-              <div class="color-option" style="background: #A67B5B;"></div>
-              <span>Teak</span>
-            </div>
-            <div class="option-card" data-category="color" onclick="selectOption('color', 'maple')">
-              <div class="color-option" style="background: #F5F5DC;"></div>
-              <span>Maple</span>
-            </div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <input type="color" id="colorPicker" value="#D2B48C" oninput="selectCustomColor(this.value)" style="width: 60px; height: 60px; border: none; cursor: pointer; background: none;">
+            <span id="colorValue" style="font-family: monospace; font-size: 1.1rem;">#D2B48C</span>
           </div>
+          <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">Select any color for your furniture finish.</p>
         </div>
 
         <div class="option-group">
@@ -525,6 +492,66 @@
     // Global variable for current price
     let currentPrice = 0;
 
+    // Color mapping for visual updates (matches UI colors)
+    const colorMap = {
+      natural: 'transparent', 
+      dark: '#654321',
+      light: '#F5DEB3',
+      ebony: '#2F1B14',
+      cherry: '#8B0000',
+      walnut: '#3C2F2F',
+      mahogany: '#C04000',
+      teak: '#A67B5B',
+      maple: '#F5F5DC'
+    };
+
+    // Function to update visual preview
+    function updateVisuals() {
+      const img = document.getElementById('previewImg');
+      const overlay = document.getElementById('colorOverlay');
+      
+      if (!img || !overlay) return;
+
+      // 1. Update Color (Tint)
+      let color = colorMap[customizations.color];
+      if (!color && customizations.color.startsWith('#')) {
+        color = customizations.color;
+      }
+      color = color || 'transparent';
+      overlay.style.backgroundColor = color;
+      // Only apply opacity if a color is selected (not natural)
+      overlay.style.opacity = customizations.color === 'natural' ? '0' : '0.5';
+
+      // 2. Update Finish (CSS Filters)
+      let filter = '';
+      switch (customizations.finish) {
+        case 'matte':
+          filter = 'contrast(0.9) brightness(1.05)';
+          break;
+        case 'glossy':
+          filter = 'contrast(1.1) saturate(1.2) brightness(1.1)';
+          break;
+        case 'satin':
+          filter = 'contrast(1.0) sepia(0.1)';
+          break;
+        case 'semi-gloss':
+          filter = 'contrast(1.05) brightness(1.02)';
+          break;
+        case 'distressed':
+          filter = 'sepia(0.4) contrast(1.2) brightness(0.9)';
+          break;
+        default:
+          filter = 'none';
+      }
+      img.style.filter = filter;
+
+      // 3. Update Size (Transform Scale)
+      let scale = 1;
+      if (customizations.size === 'compact') scale = 0.85;
+      if (customizations.size === 'large') scale = 1.15;
+      img.style.transform = `scale(${scale})`;
+    }
+
     // Function to update price based on customizations
     function updatePrice() {
       // Base price from selectedFurniture or default
@@ -557,7 +584,10 @@
         large: 1000
       };
 
-      const colorCost = colorCosts[customizations.color] || 0;
+      let colorCost = colorCosts[customizations.color];
+      if (colorCost === undefined) {
+        colorCost = customizations.color.startsWith('#') ? 500 : 0;
+      }
       const finishCost = finishCosts[customizations.finish] || 0;
       const sizeCost = sizeCosts[customizations.size] || 0;
 
@@ -633,7 +663,11 @@
         document.getElementById('shapeParts').innerHTML = '';
       }
 
-      document.getElementById('itemImage').innerHTML = `<img src="${furnitureImageSrc}" alt="${selectedFurniture.name}" style="width: 100%; height: 100%; object-fit: cover;">`;
+      document.getElementById('itemImage').innerHTML = `
+        <div style="position: relative; width: 100%; height: 100%;">
+          <img id="previewImg" src="${furnitureImageSrc}" alt="${selectedFurniture.name}" style="width: 100%; height: 100%; object-fit: cover; transition: all 0.3s ease;">
+          <div id="colorOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; mix-blend-mode: multiply; pointer-events: none; transition: background-color 0.3s ease;"></div>
+        </div>`;
 
       // Set GIF based on furniture type
       const gifMap = {
@@ -653,6 +687,7 @@
       }
 
       updatePrice();
+      updateVisuals(); // Initial visual update
     } else {
       // If no selection, redirect back
       alert('No furniture selected. Please go back and select a piece.');
@@ -674,9 +709,16 @@
 
       customizations[category] = value;
 
-      // Note: Image remains as the original from craft.html as per user request
-
       updatePrice();
+      updateVisuals(); // Trigger visual update on selection
+    }
+
+    // Handle Custom Color Selection
+    function selectCustomColor(hex) {
+      customizations.color = hex;
+      document.getElementById('colorValue').textContent = hex;
+      updatePrice();
+      updateVisuals();
     }
 
     // Change quantity
