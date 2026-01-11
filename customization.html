@@ -1,0 +1,631 @@
+Here is the updated code with the **syntax fixed** (make sure you copy *only* the code block below to avoid text appearing at the top of your page), the **scrollbar removed** from the right side, and the **screenshot function updated** to capture the entire full-screen page.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FurniCraft - Customize Your Furniture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      min-height: 100vh;
+      color: #2c3e50;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #CD853F 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      box-shadow: 0 4px 20px rgba(139, 69, 19, 0.3);
+      position: relative;
+    }
+    
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="wood" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="%23A0522D"/><path d="M0,10 Q5,8 10,10 T20,10" stroke="%23D2691E" stroke-width="0.5" fill="none"/><path d="M0,15 Q5,13 10,15 T20,15" stroke="%23CD853F" stroke-width="0.3" fill="none"/></pattern></defs><rect width="100" height="100" fill="url(%23wood)"/></svg>');
+      opacity: 0.1;
+      pointer-events: none;
+    }
+
+    .logo { display: flex; align-items: center; gap: 0.5rem; font-size: 1.8rem; }
+    .logo::before { content: '🪑'; font-size: 2rem; }
+    #user { background: rgba(255, 255, 255, 0.2); padding: 0.5rem 1rem; border-radius: 25px; font-size: 0.9rem; backdrop-filter: blur(10px); }
+
+    /* Main Content */
+    main { padding: 3rem 2rem; max-width: 1400px; margin: 0 auto; }
+    .page-header { text-align: center; margin-bottom: 3rem; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #8B4513; margin-bottom: 1rem; }
+    .page-header p { font-size: 1.1rem; color: #6c757d; max-width: 600px; margin: 0 auto; }
+
+    /* Customization Grid Layout */
+    .customization-container { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; /* Split 50/50 */
+        gap: 3rem; 
+        align-items: start; /* Aligns items to top */
+    }
+
+    /* Left Side: Preview */
+    .selected-item {
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+      border-radius: 20px; padding: 2rem; text-align: center;
+      border: 1px solid rgba(139, 69, 19, 0.1);
+      box-shadow: 0 10px 30px rgba(139, 69, 19, 0.1);
+      position: sticky; /* Keeps the preview visible if the right side is long */
+      top: 2rem; 
+    }
+    .item-image { width: 100%; max-width: 400px; height: 350px; margin: 0 auto 1rem; border-radius: 10px; overflow: hidden; border: 2px solid #8B4513; position: relative; }
+    
+    .selected-item h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #2c3e50; margin-bottom: 0.5rem; }
+    .selected-item .material { color: #8B4513; font-weight: 600; margin-bottom: 1rem; }
+    .material-parts { margin-bottom: 1rem; font-size: 0.9rem; color: #495057; text-align: left; background: #fff; padding: 1rem; border-radius: 10px; border: 1px solid #eee; }
+    .material-parts div { margin-bottom: 0.5rem; }
+
+    /* Right Side: Options (MODIFIED: No Scrollbar) */
+    .customization-options {
+      background: white; 
+      border-radius: 20px; 
+      padding: 2rem;
+      border: 1px solid rgba(139, 69, 19, 0.1);
+      box-shadow: 0 10px 30px rgba(139, 69, 19, 0.1);
+      /* Removed max-height and overflow-y to show full content */
+      height: auto; 
+    }
+
+    .customization-options h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #8B4513; margin-bottom: 2rem; text-align: center; }
+
+    .option-group { margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem; }
+    .option-group label { display: block; font-weight: 600; color: #495057; margin-bottom: 0.5rem; text-transform: capitalize; }
+    
+    /* Grid for Color Buttons */
+    .option-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+
+    .option-card {
+      background: #f8f9fa; border-radius: 10px; padding: 0.8rem; text-align: center;
+      cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent;
+    }
+    .option-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+    .option-card.selected { border-color: #8B4513; background: linear-gradient(135deg, #8B4513, #CD853F); color: white; }
+    
+    .color-option { width: 30px; height: 30px; border-radius: 50%; margin: 0 auto 0.5rem; border: 2px solid #dee2e6; }
+    .option-card.selected .color-option { border-color: white; }
+
+    .quantity-selector { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 1rem 0; }
+    .quantity-btn { background: #8B4513; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: all 0.3s ease; }
+    .quantity-btn:hover { background: #A0522D; transform: scale(1.1); }
+    .quantity-input { width: 60px; text-align: center; padding: 0.5rem; border: 1px solid #dee2e6; border-radius: 5px; font-size: 1.1rem; }
+
+    .proceed-btn {
+      background: linear-gradient(135deg, #8B4513, #CD853F); color: white; border: none; padding: 1rem 2rem;
+      border-radius: 25px; font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: all 0.3s ease; margin-top: 1rem; width: 100%;
+    }
+    .proceed-btn:hover { background: linear-gradient(135deg, #A0522D, #D2691E); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(139, 69, 19, 0.3); }
+
+    .price-notice { font-size: 0.9rem; color: #8B4513; font-style: italic; text-align: center; margin-top: 0.5rem; }
+
+    @media (max-width: 768px) {
+      .customization-container { grid-template-columns: 1fr; }
+      .selected-item { position: static; } /* Remove sticky on mobile */
+      .item-image { width: 100%; max-width: 300px; height: 300px; }
+    }
+    
+    .fade-in { animation: fadeIn 0.6s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display: flex; align-items: center;">
+      <button onclick="window.history.back()" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; margin-right: 1rem;">← Back</button>
+      <div class="logo">FurniCraft</div>
+    </div>
+    <span id="user">Welcome!</span>
+  </header>
+
+  <main id="captureArea">
+    <div class="page-header">
+      <h1>Customize Your Furniture</h1>
+      <p>Personalize every part of your furniture with our premium color palette.</p>
+    </div>
+
+    <div class="customization-container fade-in">
+      <div class="selected-item">
+        <button id="toggle3DBtn" onclick="toggle3D()" style="display: block; margin: 0 auto 1rem; padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid #8B4513; background: white; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">Switch to 3D View</button>
+        
+        <div id="itemImage" class="item-image">
+            <div id="imageContainer" style="width: 100%; height: 100%; position: relative;">
+                <img id="previewImg" src="" alt="Furniture" style="width: 100%; height: 100%; object-fit: cover;">
+                <div id="colorOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; mix-blend-mode: multiply; pointer-events: none; transition: background-color 0.3s ease;"></div>
+            </div>
+            </div>
+
+        <h2 id="itemName"></h2>
+        <div class="material" id="itemMaterial"></div>
+        
+        <div style="display: flex; gap: 1rem; flex-direction: column;">
+            <div id="materialParts" class="material-parts" style="width: 100%;"></div>
+            <div id="shapeParts" class="material-parts" style="width: 100%;"></div>
+        </div>
+        
+        <p id="itemDescription" style="margin-bottom: 1rem;"></p>
+
+        <div class="custom-description" style="margin-top: 1rem; text-align: left;">
+          <label for="customDescription" style="display: block; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Additional Design Notes:</label>
+          <textarea id="customDescription" rows="3" placeholder="Enter specific requests (e.g., 'Make the legs extra sturdy')..." style="width: 100%; padding: 0.5rem; border: 1px solid #dee2e6; border-radius: 5px; font-family: inherit; resize: vertical;"></textarea>
+        </div>
+      </div>
+
+      <div class="customization-options">
+        <h3>Customization Options</h3>
+
+        <div id="partColorsContainer">
+          </div>
+
+        <div class="option-group">
+          <label>Finish:</label>
+          <div class="option-grid">
+            <div class="option-card selected" onclick="selectOption('finish', 'glossy')"><span>Glossy</span></div>
+            <div class="option-card" onclick="selectOption('finish', 'matte')"><span>Matte</span></div>
+            <div class="option-card" onclick="selectOption('finish', 'satin')"><span>Satin</span></div>
+            <div class="option-card" onclick="selectOption('finish', 'distressed')"><span>Distressed</span></div>
+          </div>
+        </div>
+
+        <div class="option-group">
+          <label>Size:</label>
+          <div class="option-grid">
+            <div class="option-card" onclick="selectOption('size', 'compact')"><span>Compact</span></div>
+            <div class="option-card selected" onclick="selectOption('size', 'standard')"><span>Standard</span></div>
+            <div class="option-card" onclick="selectOption('size', 'large')"><span>Large</span></div>
+          </div>
+        </div>
+
+        <div class="option-group">
+          <label>Quantity:</label>
+          <div class="quantity-selector">
+            <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+            <input type="number" id="quantity" class="quantity-input" value="1" min="1" max="10">
+            <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+          </div>
+        </div>
+
+        <div id="itemPrice" class="price" style="font-size: 1.5rem; font-weight: 700; color: #8B4513; text-align: center; margin: 1rem 0;"></div>
+        <p class="price-notice">Prices may vary depending on material market rates.</p>
+
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+          <button class="proceed-btn" onclick="saveAsPNG()" style="background: #6c757d;">Save as Screenshot</button>
+          <button class="proceed-btn" onclick="proceedToOrder()">Order Now</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // --- 1. Data Definitions ---
+    const allMaterials = {
+      narra: { name: 'Narra', priceModifier: 200 },
+      aninapla: { name: 'Aninapla', priceModifier: 100 },
+      mahogany: { name: 'Mahogany', priceModifier: 150 },
+      steel: { name: 'Steel', priceModifier: 200 },
+      aluminum: { name: 'Aluminum', priceModifier: 100 },
+      fabric: { name: 'Fabric', priceModifier: 75 },
+      leather: { name: 'Leather', priceModifier: 300 },
+      plastic: { name: 'Plastic', priceModifier: -25 }
+    };
+
+    // The available colors the user can choose from
+    const availableColors = [
+      { id: 'natural', name: 'Natural', hex: '#DEB887', cost: 0 },
+      { id: 'dark', name: 'Dark Oak', hex: '#654321', cost: 500 },
+      { id: 'light', name: 'Light Maple', hex: '#F5DEB3', cost: 300 },
+      { id: 'ebony', name: 'Ebony', hex: '#2F1B14', cost: 800 },
+      { id: 'cherry', name: 'Cherry', hex: '#8B0000', cost: 600 },
+      { id: 'white', name: 'Modern White', hex: '#F5F5F5', cost: 400 },
+      { id: 'black', name: 'Sleek Black', hex: '#212121', cost: 400 },
+      { id: 'gold', name: 'Gold Accent', hex: '#FFD700', cost: 1000 }
+    ];
+
+    // Furniture Parts Definition (Matches 8 Types)
+    const furnitureParts = {
+      chair: ['Seat', 'Back', 'Legs'],
+      table: ['Top', 'Legs'],
+      sofa: ['Frame', 'Cushions', 'Arms'],
+      cabinet: ['Frame', 'Doors', 'Shelves'],
+      bed: ['Frame', 'Headboard'],
+      bookshelf: ['Frame', 'Shelves'],
+      desk: ['Top', 'Legs', 'Drawers'],
+      stool: ['Seat', 'Legs']
+    };
+
+    // --- 2. Initialization ---
+    const userName = sessionStorage.getItem('username');
+    if (userName) document.getElementById('user').textContent = `Welcome, ${userName}!`;
+
+    const selectedFurniture = JSON.parse(sessionStorage.getItem('selectedFurniture') || '{}');
+    const selectedMaterials = JSON.parse(sessionStorage.getItem('selectedMaterials') || '{}');
+    const selectedShapes = JSON.parse(sessionStorage.getItem('selectedShapes') || '{}');
+    const isCombined = sessionStorage.getItem('isCombined') === 'true';
+
+    // Default Customizations
+    let customizations = {
+      finish: 'glossy',
+      partColors: {}, // Will hold { Seat: 'natural', Legs: 'black' }
+      size: 'standard',
+      quantity: 1
+    };
+
+    // Redirect if data missing
+    if (!selectedFurniture.type) {
+        // For debugging locally, we can set a dummy fallback if session is empty
+        // console.warn("No furniture data found. Using fallback.");
+        // selectedFurniture.type = 'chair'; 
+        // selectedFurniture.name = 'Debug Chair';
+    }
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+        setupUI();
+        initPartColors(); // Create color pickers based on parts
+        updatePrice();
+        init3D(); // Start 3D engine
+    });
+
+    function setupUI() {
+        // Set Headers
+        document.getElementById('itemName').textContent = selectedFurniture.name || "Selected Item";
+        document.getElementById('previewImg').src = selectedFurniture.image || 'images/chair.jpg';
+        
+        // Material Description
+        if(isCombined) {
+             document.getElementById('itemMaterial').textContent = "Combined Materials";
+             let partsHtml = '';
+             for(const [part, mat] of Object.entries(selectedMaterials)) {
+                 partsHtml += `<div><strong>${part}:</strong> ${allMaterials[mat]?.name || mat}</div>`;
+             }
+             document.getElementById('materialParts').innerHTML = partsHtml;
+        } else {
+             const matData = selectedMaterials.all || {};
+             document.getElementById('itemMaterial').textContent = matData.name || "Standard";
+             document.getElementById('itemDescription').textContent = matData.description || "";
+        }
+
+        // Shape Description
+        let shapeHtml = '';
+        for(const [part, shape] of Object.entries(selectedShapes)) {
+             shapeHtml += `<div><strong>${part} Shape:</strong> ${shape}</div>`;
+        }
+        document.getElementById('shapeParts').innerHTML = shapeHtml;
+    }
+
+    // --- 3. Dynamic Color Logic ---
+    function initPartColors() {
+        const type = selectedFurniture.type || 'chair';
+        const parts = furnitureParts[type] || ['Body']; // Fallback
+
+        // Initialize defaults
+        parts.forEach(part => {
+            if(!customizations.partColors[part]) {
+                customizations.partColors[part] = 'natural';
+            }
+        });
+
+        renderPartColorSelectors(parts);
+    }
+
+    function renderPartColorSelectors(parts) {
+        const container = document.getElementById('partColorsContainer');
+        container.innerHTML = '';
+
+        parts.forEach(part => {
+            const group = document.createElement('div');
+            group.className = 'option-group';
+            
+            const label = document.createElement('label');
+            label.textContent = `${part} Color:`;
+            group.appendChild(label);
+
+            const grid = document.createElement('div');
+            grid.className = 'option-grid';
+
+            availableColors.forEach(color => {
+                const isSelected = customizations.partColors[part] === color.id;
+                const card = document.createElement('div');
+                card.className = `option-card ${isSelected ? 'selected' : ''}`;
+                card.onclick = () => selectPartColor(part, color.id);
+                card.innerHTML = `
+                    <div class="color-option" style="background: ${color.hex};"></div>
+                    <span style="font-size:0.8rem">${color.name}</span>
+                `;
+                grid.appendChild(card);
+            });
+
+            group.appendChild(grid);
+            container.appendChild(group);
+        });
+    }
+
+    function selectPartColor(part, colorId) {
+        customizations.partColors[part] = colorId;
+        // Re-render to show selection state
+        const type = selectedFurniture.type || 'chair';
+        renderPartColorSelectors(furnitureParts[type]);
+        updatePrice();
+        updateVisuals();
+    }
+
+    function selectOption(category, value) {
+        // Handle Finish and Size
+        customizations[category] = value;
+        
+        // Visual toggle for static options
+        const options = document.querySelectorAll(`.option-card[onclick*="'${category}'"]`);
+        options.forEach(opt => opt.classList.remove('selected'));
+        event.currentTarget.classList.add('selected');
+
+        updatePrice();
+        updateVisuals();
+    }
+
+    // --- 4. Pricing Logic ---
+    function updatePrice() {
+        let basePrice = 5000;
+        if(selectedFurniture.price) {
+            basePrice = parseInt(selectedFurniture.price.replace(/[^\d]/g, '')) || 5000;
+        }
+        
+        // Calculate Add-ons
+        let extras = 0;
+        
+        // Color Costs (Sum of all parts)
+        Object.values(customizations.partColors).forEach(colorId => {
+            const colorData = availableColors.find(c => c.id === colorId);
+            if(colorData) extras += colorData.cost;
+        });
+
+        // Size adjustment
+        if(customizations.size === 'compact') extras -= 500;
+        if(customizations.size === 'large') extras += 1500;
+
+        const total = (basePrice + extras) * customizations.quantity;
+        document.getElementById('itemPrice').textContent = `₱${total.toLocaleString()}`;
+    }
+
+    function changeQuantity(delta) {
+        let q = parseInt(document.getElementById('quantity').value) + delta;
+        if(q < 1) q = 1;
+        if(q > 10) q = 10;
+        document.getElementById('quantity').value = q;
+        customizations.quantity = q;
+        updatePrice();
+    }
+
+    // --- 5. Visual Updates ---
+    function updateVisuals() {
+        // Update 3D Model
+        if(is3DInitialized) update3DColor();
+
+        // Update 2D Tint (Uses the color of the first part found)
+        const firstPart = Object.keys(customizations.partColors)[0];
+        const colorId = customizations.partColors[firstPart];
+        const colorData = availableColors.find(c => c.id === colorId);
+        
+        const overlay = document.getElementById('colorOverlay');
+        if(colorData && colorData.id !== 'natural') {
+            overlay.style.backgroundColor = colorData.hex;
+            overlay.style.opacity = '0.3';
+        } else {
+            overlay.style.opacity = '0';
+        }
+    }
+
+    // --- 6. 3D Engine (Expanded for 8 Types) ---
+    let scene, camera, renderer, furnitureMesh, controls;
+    let is3DInitialized = false;
+
+    function init3D() {
+        if (is3DInitialized) return;
+        const container = document.getElementById('itemImage');
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff);
+
+        camera = new THREE.PerspectiveCamera(50, w/h, 0.1, 100);
+        camera.position.set(3, 3, 4);
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(w, h);
+        renderer.domElement.id = 'threeCanvas';
+        renderer.domElement.style.display = 'none';
+        container.appendChild(renderer.domElement);
+
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        // Lighting
+        const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambient);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(5, 10, 7);
+        scene.add(dirLight);
+
+        // Build Mesh
+        furnitureMesh = buildFurnitureModel(selectedFurniture.type || 'chair', selectedShapes);
+        scene.add(furnitureMesh);
+
+        is3DInitialized = true;
+        animate();
+        update3DColor();
+    }
+
+    function buildFurnitureModel(type, shapes) {
+        const group = new THREE.Group();
+        const mat = new THREE.MeshStandardMaterial({ color: 0xDEB887 }); // Default Natural
+
+        // Helper to create parts
+        const addPart = (geo, x, y, z, name) => {
+            const mesh = new THREE.Mesh(geo, mat.clone());
+            mesh.position.set(x, y, z);
+            mesh.name = name; // CRITICAL: This allows us to color this specific part later
+            mesh.castShadow = true;
+            group.add(mesh);
+        };
+
+        const s = shapes || {};
+
+        // --- Logic for all 8 Furniture Types ---
+        if (type === 'chair') {
+            addPart(new THREE.BoxGeometry(1.5, 0.1, 1.5), 0, 1, 0, 'Seat');
+            addPart(new THREE.BoxGeometry(1.5, 1.5, 0.1), 0, 1.8, -0.7, 'Back');
+            const lGeo = new THREE.CylinderGeometry(0.1, 0.1, 1);
+            addPart(lGeo, -0.6, 0.5, 0.6, 'Legs');
+            addPart(lGeo, 0.6, 0.5, 0.6, 'Legs');
+            addPart(lGeo, -0.6, 0.5, -0.6, 'Legs');
+            addPart(lGeo, 0.6, 0.5, -0.6, 'Legs');
+        } 
+        else if (type === 'table') {
+            addPart(new THREE.BoxGeometry(3, 0.1, 2), 0, 1.5, 0, 'Top');
+            const lGeo = new THREE.CylinderGeometry(0.1, 0.1, 1.5);
+            addPart(lGeo, -1.2, 0.75, 0.8, 'Legs');
+            addPart(lGeo, 1.2, 0.75, 0.8, 'Legs');
+            addPart(lGeo, -1.2, 0.75, -0.8, 'Legs');
+            addPart(lGeo, 1.2, 0.75, -0.8, 'Legs');
+        }
+        else if (type === 'sofa') {
+            addPart(new THREE.BoxGeometry(3, 0.5, 1), 0, 0.5, 0, 'Frame');
+            addPart(new THREE.BoxGeometry(3, 1, 0.3), 0, 1.2, -0.35, 'Cushions');
+            addPart(new THREE.BoxGeometry(2.8, 0.2, 0.9), 0, 0.85, 0, 'Cushions');
+            addPart(new THREE.BoxGeometry(0.3, 1, 1), -1.4, 0.8, 0, 'Arms');
+            addPart(new THREE.BoxGeometry(0.3, 1, 1), 1.4, 0.8, 0, 'Arms');
+        }
+        else if (type === 'cabinet') {
+            addPart(new THREE.BoxGeometry(2, 3, 1), 0, 1.5, 0, 'Frame');
+            addPart(new THREE.BoxGeometry(0.95, 2.8, 0.05), -0.5, 1.5, 0.5, 'Doors');
+            addPart(new THREE.BoxGeometry(0.95, 2.8, 0.05), 0.5, 1.5, 0.5, 'Doors');
+            addPart(new THREE.BoxGeometry(1.9, 0.05, 0.9), 0, 1.5, 0, 'Shelves');
+        }
+        else if (type === 'bed') {
+            addPart(new THREE.BoxGeometry(3, 0.5, 4), 0, 0.5, 0, 'Frame');
+            addPart(new THREE.BoxGeometry(3.2, 2, 0.2), 0, 1.5, -2, 'Headboard');
+        }
+        else if (type === 'bookshelf') {
+            addPart(new THREE.BoxGeometry(2, 3, 0.8), 0, 1.5, 0, 'Frame');
+            addPart(new THREE.BoxGeometry(1.8, 0.05, 0.75), 0, 0.8, 0, 'Shelves');
+            addPart(new THREE.BoxGeometry(1.8, 0.05, 0.75), 0, 1.6, 0, 'Shelves');
+            addPart(new THREE.BoxGeometry(1.8, 0.05, 0.75), 0, 2.4, 0, 'Shelves');
+        }
+        else if (type === 'desk') {
+            addPart(new THREE.BoxGeometry(3, 0.1, 1.5), 0, 1.5, 0, 'Top');
+            addPart(new THREE.BoxGeometry(0.8, 1, 1.4), 1, 1, 0, 'Drawers');
+            addPart(new THREE.CylinderGeometry(0.05, 0.05, 1.5), -1.2, 0.75, 0.6, 'Legs');
+            addPart(new THREE.CylinderGeometry(0.05, 0.05, 1.5), -1.2, 0.75, -0.6, 'Legs');
+        }
+        else if (type === 'stool') {
+            addPart(new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32), 0, 1.2, 0, 'Seat');
+            addPart(new THREE.CylinderGeometry(0.08, 0.05, 1.2), -0.5, 0.6, 0, 'Legs');
+            addPart(new THREE.CylinderGeometry(0.08, 0.05, 1.2), 0.5, 0.6, 0, 'Legs');
+            addPart(new THREE.CylinderGeometry(0.08, 0.05, 1.2), 0, 0.6, 0.5, 'Legs');
+        } else {
+            // Fallback generic
+            addPart(new THREE.BoxGeometry(1, 1, 1), 0, 0.5, 0, 'Body');
+        }
+
+        return group;
+    }
+
+    function toggle3D() {
+        if(!is3DInitialized) init3D();
+        const canvas = document.getElementById('threeCanvas');
+        const imgCont = document.getElementById('imageContainer');
+        const btn = document.getElementById('toggle3DBtn');
+
+        if(canvas.style.display === 'none') {
+            canvas.style.display = 'block';
+            imgCont.style.display = 'none';
+            btn.textContent = 'Switch to 2D View';
+        } else {
+            canvas.style.display = 'none';
+            imgCont.style.display = 'block';
+            btn.textContent = 'Switch to 3D View';
+        }
+    }
+
+    function update3DColor() {
+        if(!furnitureMesh) return;
+
+        furnitureMesh.children.forEach(mesh => {
+            // Get the color selected for this specific part
+            const colorId = customizations.partColors[mesh.name] || 'natural';
+            const colorData = availableColors.find(c => c.id === colorId);
+            const hex = colorData ? colorData.hex : '#DEB887';
+            
+            mesh.material.color.set(hex);
+            
+            // Apply Finish effects
+            if(customizations.finish === 'glossy') {
+                mesh.material.roughness = 0.2; mesh.material.metalness = 0.3;
+            } else if (customizations.finish === 'matte') {
+                mesh.material.roughness = 0.9; mesh.material.metalness = 0.0;
+            } else {
+                mesh.material.roughness = 0.5; mesh.material.metalness = 0.1;
+            }
+        });
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        if(controls) controls.update();
+        renderer.render(scene, camera);
+    }
+
+    // --- Updated Screenshot Logic (Full Page) ---
+    function saveAsPNG() {
+        // Scroll to top first to avoid cropping issues
+        window.scrollTo(0, 0);
+        
+        // Target document.body to capture the whole page
+        html2canvas(document.body, {
+            scrollY: -window.scrollY, // Correct scroll offset
+            useCORS: true // Better image handling
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `FurniCraft-Design-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
+
+    function proceedToOrder() {
+        sessionStorage.setItem('finalCustomization', JSON.stringify(customizations));
+        sessionStorage.setItem('finalPrice', document.getElementById('itemPrice').textContent);
+        window.location.href = 'shop.html';
+    }
+  </script>
+</body>
+</html>
+```

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FurniCraft - Custom Furniture Design</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        /* Shared Theme Assets */
+        :root {
+            --wood-dark: #5D2906;
+            --wood-medium: #8B4513;
+            --wood-light: #D2691E;
+            --wood-accent: #CD853F;
+            --text-beige: #F5F5DC;
+            --text-wheat: #F5DEB3;
+            --gold-accent: #FFD700;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Exact gradient from Login Page */
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 25%, #D2691E 50%, #CD853F 75%, #DEB887 100%);
+            background-size: 400% 400%;
+            animation: woodGrainShift 15s ease-in-out infinite alternate;
+            color: var(--text-beige);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Wood Grain Animation */
+        @keyframes woodGrainShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Subtle Wood Texture Overlay (Matching Login Page) */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="100" y2="100" stroke="%23FFFFFF" stroke-width="0.5" opacity="0.05"/><line x1="0" y1="100" x2="100" y2="0" stroke="%23FFFFFF" stroke-width="0.3" opacity="0.03"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            /* darkened wood tone for header */
+            background: linear-gradient(to bottom, rgba(62, 39, 35, 0.95), rgba(93, 64, 55, 0.9));
+            color: var(--text-wheat);
+            padding: 20px;
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 2.8em;
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border-bottom: 2px solid rgba(210, 105, 30, 0.6);
+            z-index: 2;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        /* Header Icon styling */
+        header i {
+            color: var(--wood-light);
+            margin-right: 15px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto 80px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            animation: fadeInUp 1s ease forwards;
+            position: relative;
+            z-index: 1;
+            flex: 1; /* Pushes footer down */
+        }
+
+        /* Glassmorphism backing for the content area to match Login Box */
+        .content-wrapper {
+            background: linear-gradient(145deg, rgba(139, 69, 19, 0.8) 0%, rgba(160, 82, 45, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid rgba(210, 105, 30, 0.6);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .hero-image {
+            flex: 1;
+            position: relative;
+            text-align: center;
+        }
+
+        .hero-image img {
+            width: 100%;
+            max-width: 520px;
+            height: auto;
+            object-fit: cover;
+            border-radius: 15px;
+            /* Bronze/Wood border for image */
+            border: 4px solid rgba(210, 105, 30, 0.5); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .hero-image img:hover {
+            transform: scale(1.02);
+            border-color: var(--gold-accent);
+        }
+
+        .hero-content {
+            flex: 1;
+            position: relative;
+            text-align: left;
+        }
+
+        .hero h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 38px;
+            margin-bottom: 25px;
+            color: var(--text-wheat); /* Light wheat color */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .hero p {
+            font-size: 19px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            color: var(--text-beige); /* Off-white for readability */
+            max-width: 600px;
+            font-weight: 300;
+        }
+
+        /* Adapted CTA Button to match Login Button */
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(145deg, #D2691E 0%, #CD853F 100%);
+            color: #F5F5DC;
+            padding: 18px 45px;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 1.3em;
+            font-weight: bold;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .cta-button i {
+            margin-left: 10px;
+        }
+
+        .cta-button:hover {
+            background: linear-gradient(145deg, #CD853F 0%, #D2691E 100%);
+            box-shadow: 0 12px 20px rgba(210, 105, 30, 0.6);
+            transform: translateY(-3px) scale(1.02);
+            color: #FFF;
+        }
+
+        footer {
+            background: linear-gradient(to top, rgba(62, 39, 35, 0.95), rgba(93, 64, 55, 0.9));
+            color: var(--text-beige);
+            text-align: center;
+            padding: 15px;
+            width: 100%;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 300;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.3);
+            border-top: 2px solid rgba(210, 105, 30, 0.6);
+            z-index: 2;
+        }
+
+        /* Floating Particles (Simplified version of Login Page) */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.05);
+            animation: float 25s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+            .content-wrapper {
+                flex-direction: column;
+                gap: 30px;
+                padding: 20px;
+            }
+            .hero-content {
+                text-align: center;
+            }
+            .hero p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .hero-image img {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="particles" id="particles"></div>
+
+    <header>
+        <i class="fas fa-hammer"></i>FurniCraft
+    </header>
+
+    <div class="container">
+        <div class="content-wrapper">
+            <section class="hero-image">
+                <img src="images/desk.jpg" alt="Custom Wood Desk" />
+            </section>
+            <section class="hero-content hero">
+                <h2>Design Your Dream Furniture</h2>
+                <p>FurniCraft is your ultimate platform for creating custom furniture pieces. From rustic chairs to modern desks, bring your ideas to life with our intuitive design tools. Experience the art of woodworking digitally.</p>
+                <a href="login.html" class="cta-button">Get Started <i class="fas fa-arrow-right"></i></a>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2025 FurniCraft. All rights reserved. <br>
+        <span style="font-size: 0.8em; opacity: 0.7; font-style: italic;">Build, Design, Create – With Ease</span>
+    </footer>
+
+    <script>
+        // Simple particle generator to match the login page vibe
+        function createParticles() {
+            const particlesContainer = document.getElementById("particles");
+            const icons = ['\uf5c2', '\uf1fa', '\uf6bb', '\uf0e4']; // Font Awesome Codes
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement("div");
+                particle.className = "particle";
+                particle.innerHTML = `<i class="fas" style="font-size: ${Math.random() * 3 + 2}rem;">${icons[Math.floor(Math.random() * icons.length)]}</i>`;
+                particle.style.left = Math.random() * 100 + "%";
+                particle.style.animationDelay = Math.random() * 5 + "s";
+                particle.style.animationDuration = (Math.random() * 10 + 20) + "s";
+                particlesContainer.appendChild(particle);
+            }
+        }
+        createParticles();
+    </script>
+</body>
+</html>

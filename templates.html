@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FurniCraft CAD - Template Gallery</title>
+  
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  
+  <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #1e1e1e;
+      --bg-panel: #252526;
+      --bg-header: #333333;
+      --accent: #d35400;
+      --template-accent: #8e44ad;
+      --text-main: #e0e0e0;
+      --text-dim: #999;
+      --border: #3e3e42;
+      --gold: #f1c40f;
+      --rec-bg: #442a53; 
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      height: 45px;
+      flex-shrink: 0;
+      background-color: var(--bg-header);
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+      border-bottom: 1px solid var(--border);
+      justify-content: space-between;
+    }
+    .brand { font-weight: 600; color: white; display: flex; align-items: center; gap: 8px; }
+    .header-controls button {
+      background: transparent; border: none; color: var(--text-main);
+      margin-left: 15px; cursor: pointer; font-size: 0.9rem;
+    }
+    .header-controls button:hover { color: var(--template-accent); }
+    
+    .btn-export {
+      background: #27ae60 !important;
+      color: white !important;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .btn-export:hover { background: #2ecc71 !important; }
+
+    /* WORKSPACE */
+    .workspace { 
+      display: flex; 
+      flex: 1; 
+      height: calc(100vh - 45px);
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* LEFT SIDEBAR */
+    .panel-left {
+      width: 250px;
+      background-color: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .panel-header {
+      padding: 12px; font-size: 0.75rem; font-weight: 700; 
+      text-transform: uppercase; color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+    }
+    .scene-list { flex: 1; overflow-y: auto; padding: 10px; }
+    
+    .template-item {
+      padding: 15px; margin-bottom: 10px;
+      background: #333;
+      border: 1px solid var(--border);
+      border-radius: 6px; cursor: pointer;
+      display: flex; flex-direction: column; gap: 5px;
+      transition: all 0.2s;
+    }
+    .template-item:hover { background-color: #3d3d42; border-color: #999; }
+    .template-item.active { 
+        background-color: #37303d; 
+        border: 1px solid var(--template-accent);
+        box-shadow: 0 0 10px rgba(142, 68, 173, 0.2);
+    }
+    .t-name { font-weight: bold; font-size: 0.9rem; color: #fff; }
+    .t-cat { font-size: 0.75rem; color: #aaa; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+
+    /* CENTER VIEWPORT */
+    .viewport { 
+      flex: 1; 
+      position: relative; 
+      background: radial-gradient(circle at center, #2d2d30 0%, #1e1e1e 100%); 
+      overflow: hidden;
+    }
+    #canvas-container { 
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    }
+    
+    #export-overlay {
+      position: absolute; top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.85); z-index: 100;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      color: white;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3; border-top: 4px solid var(--template-accent);
+      border-radius: 50%; width: 40px; height: 40px;
+      animation: spin 1s linear infinite; margin-bottom: 15px;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* SCORE CARD */
+    .score-card {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px;
+      width: 200px; border: 1px solid var(--border); pointer-events: none;
+    }
+    .score-title { font-size: 0.7rem; color: #aaa; text-transform: uppercase; margin-bottom: 8px; }
+    .score-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem; }
+    .score-bar-bg { width: 100%; height: 4px; background: #444; margin-top: 2px; border-radius: 2px; }
+    .score-bar-fill { height: 100%; background: var(--template-accent); border-radius: 2px; transition: width 0.5s; }
+
+    /* RIGHT SIDEBAR */
+    .panel-right {
+      width: 380px;
+      background-color: var(--bg-panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .prop-scroll { flex: 1; overflow-y: auto; }
+    .prop-group { padding: 15px; border-bottom: 1px solid var(--border); }
+    .prop-label { font-size: 0.75rem; font-weight: 700; color: var(--text-dim); margin-bottom: 8px; display: block; text-transform: uppercase; }
+
+    input[type="text"], select {
+      width: 100%; background: #3c3c3c; border: 1px solid var(--border);
+      color: white; padding: 8px; border-radius: 4px; font-family: inherit; margin-bottom: 5px;
+    }
+
+    .range-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.8rem; }
+    .range-row label { width: 20px; font-weight: bold; color: #888; }
+    input[type="range"] { flex: 1; accent-color: var(--template-accent); }
+    .val-display { width: 35px; text-align: right; color: var(--text-dim); font-size:0.8rem; }
+
+    .mat-grid-large { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 15px; }
+    .mat-section-title { font-size: 0.8rem; font-weight: bold; margin: 0 0 8px 0; display: flex; align-items: center; gap: 5px; }
+    .mat-card-lg {
+      background: #333; border: 1px solid var(--border); border-radius: 4px;
+      padding: 8px; text-align: center; cursor: pointer; transition: 0.1s; position: relative;
+    }
+    .mat-card-lg.recommended { background: var(--rec-bg); border-color: var(--template-accent); }
+    .mat-card-lg:hover { transform: translateY(-2px); background: #3e3e42; border-color:white; }
+    .mat-card-icon { font-size: 1.2rem; margin-bottom: 4px; }
+    .mat-card-name { font-size: 0.7rem; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .layer-item {
+      background: #2b2b2b; border-radius: 4px; margin-bottom: 8px; border: 1px solid #333;
+      transition: all 0.2s;
+    }
+    .layer-item.active-layer {
+      border: 1px solid var(--template-accent);
+      box-shadow: 0 0 8px rgba(142, 68, 173, 0.3);
+    }
+    .layer-header {
+      padding: 10px; display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; background: #333;
+    }
+    .color-preview { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #777; }
+    .layer-content { display: none; padding: 15px; background: #222; border-top: 1px solid #444; }
+    .layer-item.open .layer-content { display: block; }
+
+    .part-control-row { margin-bottom: 15px; }
+    .part-control-label { font-size: 0.75rem; color: #aaa; margin-bottom: 5px; display: block; }
+    
+    .hex-wrapper { display: flex; align-items: center; gap: 8px; }
+    input[type="color"] { -webkit-appearance: none; border: none; width: 40px; height: 40px; cursor: pointer; background: none; padding: 0; }
+    .hex-text-input { width: 90px !important; margin:0 !important; font-family: monospace; text-transform: uppercase; }
+
+    .dim-row { display: flex; gap: 5px; margin-top: 5px; }
+    .dim-group { flex: 1; }
+    .dim-input { 
+      width: 100%; background: #111; border: 1px solid #444; color: var(--template-accent); 
+      padding: 5px; text-align: center; font-size: 0.8rem; border-radius: 3px;
+    }
+    
+    .footer-bar {
+      padding: 15px; background: #202020; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .total-price { font-size: 1.2rem; font-weight: bold; color: var(--template-accent); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <i class="fas fa-shapes"></i> FurniCraft Templates
+    </div>
+    <div class="header-controls">
+      <button onclick="window.location.href='furniture-builder.html'"><i class="fas fa-hammer"></i> Go to Builder</button>
+      <button onclick="resetCamera()"><i class="fas fa-sync"></i> Reset Cam</button>
+      <button class="btn-export" onclick="exportGIF()"><i class="fas fa-file-export"></i> Export Template</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <aside class="panel-left">
+      <div class="panel-header">Ready-Made Templates</div>
+      <div class="scene-list" id="template-list"></div>
+    </aside>
+
+    <main class="viewport">
+      <div id="canvas-container"></div>
+      
+        <div class="score-card">
+          <div class="score-title">Design Analysis</div>
+          <div class="score-row"><span>Durability</span><span id="score-dura-val">0%</span></div>
+          <div class="score-bar-bg"><div id="bar-dura" class="score-bar-fill" style="width:0%"></div></div>
+          <div class="score-row" style="margin-top:10px;"><span>Material Quality</span><span id="score-qual-val">0%</span></div>
+          <div class="score-bar-bg"><div id="bar-qual" class="score-bar-fill" style="width:0%"></div></div>
+          <div id="rec-status" style="margin-top:10px; font-size:0.7rem; color:var(--text-main);"></div>
+        </div>
+
+      <div id="export-overlay">
+        <div class="spinner"></div>
+        <h3>Rendering Template...</h3>
+        <p style="font-size:0.8rem; color:#aaa">Generating high-quality 360° preview.</p>
+      </div>
+    </main>
+
+    <aside class="panel-right">
+      <div class="panel-header">Template Properties</div>
+      <div class="prop-scroll">
+        <div class="prop-group">
+          <label class="prop-label">Materials</label>
+          
+          <div id="rec-mat-container" style="display:none">
+            <div class="mat-section-title" style="color:var(--gold);"><i class="fas fa-star"></i> Recommended Materials</div>
+            <div class="mat-grid-large" id="rec-mat-grid"></div>
+          </div>
+          
+          <div class="mat-section-title" style="color:#777; margin-top:10px;">All Materials</div>
+          <div class="mat-grid-large" id="all-mat-grid"></div>
+        </div>
+
+        <div class="prop-group">
+          <label class="prop-label">Project Name</label>
+          <input type="text" id="project-name" readonly>
+          
+          <label class="prop-label" style="margin-top:10px">Global Scale (W-H-D)</label>
+          <div class="range-row">
+             <label>W</label>
+             <input type="range" id="inp-scale-x" min="50" max="150" value="100" oninput="updateScale('x', this.value)">
+             <span class="val-display" id="gs-x">100</span>
+          </div>
+          <div class="range-row">
+             <label>H</label>
+             <input type="range" id="inp-scale-y" min="50" max="150" value="100" oninput="updateScale('y', this.value)">
+             <span class="val-display" id="gs-y">100</span>
+          </div>
+          <div class="range-row">
+             <label>D</label>
+             <input type="range" id="inp-scale-z" min="50" max="150" value="100" oninput="updateScale('z', this.value)">
+             <span class="val-display" id="gs-z">100</span>
+          </div>
+        </div>
+
+        <div class="prop-group">
+          <label class="prop-label">Layers & Configurations</label>
+          <div id="layers-container"></div>
+        </div>
+      </div>
+      <div class="footer-bar">
+        <span style="font-size:0.8rem; color:#888;">ESTIMATED COST</span>
+        <div class="total-price" id="total-price">₱0.00</div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // --- DATABASE ---
+    const materialDB = {
+      narra: { name: 'Narra', icon:'🌳', hex: '#8B4513', dura: 95, qual: 98, rec: ['table', 'chair', 'cabinet', 'bed'] },
+      mahogany: { name: 'Mahogany', icon:'🪵', hex: '#5c3a21', dura: 85, qual: 90, rec: ['table', 'cabinet'] },
+      oak: { name: 'Oak', icon:'🌳', hex: '#d4ac7d', dura: 80, qual: 85, rec: ['bed'] },
+      steel: { name: 'Steel', icon:'⚙️', hex: '#95a5a6', dura: 99, qual: 80, rec: ['chair'] },
+      fabric: { name: 'Fabric', icon:'🧶', hex: '#34495e', dura: 60, qual: 85, rec: ['sofa'] },
+      leather: { name: 'Leather', icon:'🐄', hex: '#2c3e50', dura: 75, qual: 95, rec: ['sofa', 'chair'] },
+      velvet: { name: 'Red Velvet', icon:'🧣', hex: '#7b1fa2', dura: 55, qual: 92, rec: ['sofa'] },
+      gold: { name: 'Gold Trim', icon:'✨', hex: '#f1c40f', dura: 70, qual: 100, rec: [] },
+      glass: { name: 'Glass', icon:'💎', hex: '#a8e6cf', dura: 60, qual: 90, rec: [] },
+      white: { name: 'White Wood', icon:'⚪', hex: '#eeeeee', dura: 70, qual: 70, rec: ['bed'] }
+    };
+
+    const assetsDB = {
+      chair: { parts: ['Seat', 'Back', 'Legs'], basePrice: 2500 },
+      table: { parts: ['Top', 'Legs'], basePrice: 5000 },
+      sofa: { parts: ['Frame', 'Cushions', 'Arms'], basePrice: 8000 },
+      cabinet: { parts: ['Body', 'Doors'], basePrice: 4000 },
+      bed: { parts: ['Frame', 'Headboard'], basePrice: 6000 }
+    };
+
+    // --- TEMPLATES ---
+    // UPDATED: Scale is now an object {x, y, z}
+    const readyMadeTemplates = [
+      {
+        id: 1, type: 'table', name: "Royal Mahogany Dining", icon: 'fa-utensils',
+        selections: { Top: '#5c3a21', Legs: '#f1c40f' },
+        carvings: { Top: 'floral', Legs: 'rustic' },
+        shapes: { Top: 'round', Legs: 'tapered' },
+        radius: { Top: 0, Legs: 0 },
+        dims: { Top: {w:150, h:10, d:150}, Legs: {w:15, h:75, d:15} },
+        scale: {x:1, y:1, z:1}
+      },
+      {
+        id: 2, type: 'sofa', name: "Luxe Velvet Lounge", icon: 'fa-couch',
+        selections: { Frame: '#2c3e50', Cushions: '#7b1fa2', Arms: '#2c3e50' },
+        carvings: { Frame: 'none', Cushions: 'studded', Arms: 'studded' },
+        shapes: { Frame: 'square', Cushions: 'square', Arms: 'square' },
+        radius: { Frame: 5, Cushions: 20, Arms: 10 },
+        dims: { Frame: {w:220, h:40, d:80}, Cushions: {w:180, h:15, d:70}, Arms: {w:20, h:60, d:80} },
+        scale: {x:1, y:1, z:1}
+      },
+      {
+        id: 3, type: 'chair', name: "Industrial Steel Stool", icon: 'fa-chair',
+        selections: { Seat: '#2c3e50', Back: '#95a5a6', Legs: '#95a5a6' },
+        carvings: { Seat: 'none', Back: 'linear', Legs: 'none' },
+        shapes: { Seat: 'square', Back: 'square', Legs: 'tapered' },
+        radius: { Seat: 10, Back: 0, Legs: 0 },
+        dims: { Seat: {w:45, h:5, d:45}, Back: {w:45, h:40, d:5}, Legs: {w:5, h:45, d:5} },
+        scale: {x:1, y:1, z:1}
+      },
+      {
+        id: 4, type: 'bed', name: "Nordic Minimalist Bed", icon: 'fa-bed',
+        selections: { Frame: '#d4ac7d', Headboard: '#eeeeee' },
+        carvings: { Frame: 'none', Headboard: 'weave' },
+        shapes: { Frame: 'square', Headboard: 'square' },
+        radius: { Frame: 5, Headboard: 0 },
+        dims: { Frame: {w:180, h:35, d:210}, Headboard: {w:180, h:110, d:10} },
+        scale: {x:1, y:1, z:1}
+      },
+      {
+        id: 5, type: 'cabinet', name: "Antique Wardrobe", icon: 'fa-door-closed',
+        selections: { Body: '#8B4513', Doors: '#5c3a21' },
+        carvings: { Body: 'rustic', Doors: 'floral' },
+        shapes: { Body: 'square', Doors: 'square' },
+        radius: { Body: 0, Doors: 5 },
+        dims: { Body: {w:100, h:200, d:60}, Doors: {w:45, h:190, d:5} },
+        scale: {x:1, y:1, z:1}
+      }
+    ];
+
+    let activeTemplate = null;
+    let activeLayer = null;
+
+    // --- INIT ---
+    window.onload = function() {
+      init3D();
+      const list = document.getElementById('template-list');
+      readyMadeTemplates.forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'template-item';
+        div.id = `temp-${t.id}`;
+        div.onclick = () => loadTemplate(t.id);
+        div.innerHTML = `<div class="t-name">${t.name}</div><div class="t-cat"><i class="fas ${t.icon}"></i> ${t.type.toUpperCase()}</div>`;
+        list.appendChild(div);
+      });
+      loadTemplate(1);
+    };
+
+    function loadTemplate(id) {
+      const data = readyMadeTemplates.find(t => t.id === id);
+      activeTemplate = JSON.parse(JSON.stringify(data)); 
+      
+      // Initialize properties if missing
+      if(!activeTemplate.shapes) activeTemplate.shapes = {};
+      if(!activeTemplate.radius) activeTemplate.radius = {};
+      if(!activeTemplate.carvings) activeTemplate.carvings = {};
+      if(!activeTemplate.dims) activeTemplate.dims = {};
+      
+      // Legacy support for scale
+      if(typeof activeTemplate.scale === 'number') {
+          activeTemplate.scale = {x: activeTemplate.scale, y: activeTemplate.scale, z: activeTemplate.scale};
+      }
+
+      assetsDB[activeTemplate.type].parts.forEach(p => {
+          if(!activeTemplate.shapes[p]) activeTemplate.shapes[p] = 'square';
+          if(activeTemplate.radius[p] === undefined) activeTemplate.radius[p] = 0;
+          if(!activeTemplate.carvings[p]) activeTemplate.carvings[p] = 'none';
+          if(!activeTemplate.dims[p]) activeTemplate.dims[p] = {w: 100, h: 50, d: 100};
+      });
+
+      document.querySelectorAll('.template-item').forEach(el => el.classList.remove('active'));
+      document.getElementById(`temp-${id}`).classList.add('active');
+      activeLayer = assetsDB[activeTemplate.type].parts[0];
+      renderUI();
+      build3DScene();
+    }
+
+    // --- UI RENDERING ---
+    function renderUI() {
+      document.getElementById('project-name').value = activeTemplate.name;
+      
+      // UPDATED: Set values for X, Y, Z sliders
+      document.getElementById('inp-scale-x').value = Math.round(activeTemplate.scale.x * 100);
+      document.getElementById('gs-x').innerText = Math.round(activeTemplate.scale.x * 100);
+      document.getElementById('inp-scale-y').value = Math.round(activeTemplate.scale.y * 100);
+      document.getElementById('gs-y').innerText = Math.round(activeTemplate.scale.y * 100);
+      document.getElementById('inp-scale-z').value = Math.round(activeTemplate.scale.z * 100);
+      document.getElementById('gs-z').innerText = Math.round(activeTemplate.scale.z * 100);
+
+      const recGrid = document.getElementById('rec-mat-grid');
+      const allGrid = document.getElementById('all-mat-grid');
+      const recContainer = document.getElementById('rec-mat-container');
+
+      recGrid.innerHTML = ''; 
+      allGrid.innerHTML = '';
+      
+      let hasRecs = false;
+      const allMaterials = Object.keys(materialDB);
+
+      allMaterials.forEach(k => {
+        const m = materialDB[k];
+        const isRec = m.rec.includes(activeTemplate.type);
+        if(isRec) hasRecs = true;
+
+        const card = document.createElement('div');
+        card.className = `mat-card-lg ${isRec ? 'recommended' : ''}`;
+        card.onclick = () => applyMaterial(m.hex);
+        card.innerHTML = `<div class="mat-card-icon">${m.icon}</div><div class="mat-card-name">${m.name}</div>`;
+        
+        if (isRec) recGrid.appendChild(card);
+        else allGrid.appendChild(card);
+      });
+      
+      recContainer.style.display = hasRecs ? 'block' : 'none';
+
+      const container = document.getElementById('layers-container');
+      container.innerHTML = '';
+      assetsDB[activeTemplate.type].parts.forEach(part => {
+        const hex = activeTemplate.selections[part];
+        const dims = activeTemplate.dims[part];
+        const carving = activeTemplate.carvings[part]; 
+        const shape = activeTemplate.shapes[part];
+        const radius = activeTemplate.radius[part];
+        
+        const layer = document.createElement('div');
+        layer.className = `layer-item ${activeLayer === part ? 'active-layer open' : ''}`;
+        layer.onclick = (e) => {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+            activeLayer = part;
+            renderUI();
+        };
+        
+        const carvingOptions = [
+            {v:'none', t:'None (Smooth)'},
+            {v:'floral', t:'Classic Floral'},
+            {v:'geometric', t:'Geometric'},
+            {v:'linear', t:'Linear Grooves'},
+            {v:'lattice', t:'Diamond Lattice'},
+            {v:'studded', t:'Studded/Tufted'},
+            {v:'weave', t:'Basket Weave'},
+            {v:'rustic', t:'Rustic/Aged'}
+        ].map(opt => `<option value="${opt.v}" ${carving===opt.v ? 'selected' : ''}>${opt.t}</option>`).join('');
+
+        const shapeOptions = [
+            {v:'square', t:'Box / Square'},
+            {v:'round', t:'Cylinder / Round'},
+            {v:'tapered', t:'Tapered'}
+        ].map(opt => `<option value="${opt.v}" ${shape===opt.v ? 'selected' : ''}>${opt.t}</option>`).join('');
+
+        const showRadius = (shape === 'square') ? 'block' : 'none';
+
+        layer.innerHTML = `
+          <div class="layer-header"><span>${part}</span><div class="color-preview" style="background:${hex}"></div></div>
+          <div class="layer-content">
+            <div class="part-control-row">
+                <span class="part-control-label">Shape</span>
+                <select onchange="updateShape('${part}', this.value)">${shapeOptions}</select>
+            </div>
+            <div class="part-control-row" style="display:${showRadius}">
+                <div class="range-row">
+                    <label style="width:auto; font-size:0.75rem; color:#aaa; margin-right:10px;">Corner Radius</label>
+                    <input type="range" min="0" max="50" value="${radius}" oninput="updateRadius('${part}', this.value)">
+                    <span class="val-display" id="rad-val-${part}">${radius}%</span>
+                </div>
+            </div>
+            <div class="part-control-row">
+                <span class="part-control-label">Carving Design</span>
+                <select onchange="updateCarving('${part}', this.value)">${carvingOptions}</select>
+            </div>
+            <div class="part-control-row">
+              <span class="part-control-label">Hex Color</span>
+              <div class="hex-wrapper">
+                <input type="color" value="${hex}" oninput="updateColor('${part}', this.value)">
+                <input type="text" class="hex-text-input" value="${hex}" onchange="updateColor('${part}', this.value)">
+              </div>
+            </div>
+            <div class="part-control-row">
+              <span class="part-control-label">Dimensions (cm)</span>
+              <div class="dim-row">
+                <div class="dim-group"><input class="dim-input" type="number" value="${dims.w}" oninput="updateDim('${part}','w',this.value)"></div>
+                <div class="dim-group"><input class="dim-input" type="number" value="${dims.h}" oninput="updateDim('${part}','h',this.value)"></div>
+                <div class="dim-group"><input class="dim-input" type="number" value="${dims.d}" oninput="updateDim('${part}','d',this.value)"></div>
+              </div>
+            </div>
+          </div>`;
+        container.appendChild(layer);
+      });
+      calculateCost();
+      calculateScore(); 
+    }
+
+    // --- LOGIC UPDATES ---
+
+    function calculateScore() {
+        if (!activeTemplate || !activeTemplate.selections) return;
+
+        const parts = assetsDB[activeTemplate.type].parts; 
+        let totalDura = 0, totalQual = 0, recCount = 0;
+        
+        parts.forEach(partName => {
+            const hex = activeTemplate.selections[partName];
+            const matKey = Object.keys(materialDB).find(k => materialDB[k].hex.toLowerCase() === hex.toLowerCase());
+            
+            if(matKey) {
+                const mat = materialDB[matKey];
+                totalDura += mat.dura; 
+                totalQual += mat.qual;
+                if(mat.rec.includes(activeTemplate.type)) recCount++;
+            } else { 
+                totalDura += 50; 
+                totalQual += 50; 
+            }
+        });
+        
+        const avgDura = Math.round(totalDura / parts.length);
+        const avgQual = Math.round(totalQual / parts.length);
+        const partsCount = parts.length;
+
+        const barDura = document.getElementById('bar-dura');
+        if(barDura) {
+            barDura.style.width = avgDura + '%';
+            barDura.style.background = avgDura > 80 ? '#2ecc71' : (avgDura > 50 ? 'orange' : '#e74c3c');
+            document.getElementById('score-dura-val').innerText = avgDura + '%';
+        }
+
+        const barQual = document.getElementById('bar-qual');
+        if(barQual) {
+            barQual.style.width = avgQual + '%';
+            barQual.style.background = avgQual > 80 ? '#2ecc71' : (avgQual > 50 ? 'orange' : '#e74c3c');
+            document.getElementById('score-qual-val').innerText = avgQual + '%';
+        }
+        
+        const statusEl = document.getElementById('rec-status');
+        if(statusEl) {
+            if(recCount === partsCount) {
+                statusEl.style.color = '#2ecc71';
+                statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Fully Recommended Materials';
+            } else if (recCount > 0) {
+                statusEl.style.color = '#f1c40f';
+                statusEl.innerHTML = `<i class="fas fa-info-circle"></i> ${recCount}/${partsCount} parts recommended`;
+            } else {
+                statusEl.style.color = '#e74c3c';
+                statusEl.innerHTML = '<i class="fas fa-times-circle"></i> No Recommended Materials Used';
+            }
+        }
+    }
+
+    function applyMaterial(hex) {
+      if(!activeLayer) return;
+      updateColor(activeLayer, hex);
+      renderUI();
+    }
+
+    function updateColor(part, hex) {
+        activeTemplate.selections[part] = hex;
+        if(currentGroup) {
+            currentGroup.traverse(mesh => {
+                if(mesh.name === part && mesh.isMesh) mesh.material.color.set(hex);
+            });
+        }
+        calculateScore(); 
+    }
+
+    function updateDim(part, axis, val) {
+        activeTemplate.dims[part][axis] = Math.max(parseInt(val) || 1, 1);
+        build3DScene();
+    }
+
+    function updateCarving(part, style) {
+        activeTemplate.carvings[part] = style;
+        build3DScene(); 
+    }
+
+    function updateShape(part, shape) {
+        activeTemplate.shapes[part] = shape;
+        renderUI();
+        build3DScene();
+    }
+
+    function updateRadius(part, val) {
+        activeTemplate.radius[part] = parseInt(val);
+        document.getElementById(`rad-val-${part}`).innerText = val + "%";
+        build3DScene();
+    }
+
+    // UPDATED: New function for specific axis scaling
+    function updateScale(axis, val) {
+        activeTemplate.scale[axis] = val / 100;
+        document.getElementById(`gs-${axis}`).innerText = val;
+        
+        if(currentGroup) {
+            currentGroup.scale.set(activeTemplate.scale.x, activeTemplate.scale.y, activeTemplate.scale.z);
+            update3DLabels(); 
+        }
+        calculateCost();
+    }
+
+    function calculateCost() {
+        let base = assetsDB[activeTemplate.type].basePrice;
+        // Cost is volume based: x * y * z
+        let volumeFactor = activeTemplate.scale.x * activeTemplate.scale.y * activeTemplate.scale.z;
+        let total = base * volumeFactor;
+        document.getElementById('total-price').innerText = '₱' + Math.round(total).toLocaleString();
+    }
+
+    // --- 3D ENGINE ---
+    let scene, camera, renderer, currentGroup, controls, dimGroup;
+    let animationId;
+
+    function init3D() {
+      const container = document.getElementById('canvas-container');
+      renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.innerHTML = ''; container.appendChild(renderer.domElement);
+      
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x1e1e1e);
+      
+      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+      camera.position.set(8, 6, 10);
+      
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true; 
+      controls.autoRotate = true; 
+      controls.autoRotateSpeed = 1.5; 
+      
+      const light = new THREE.DirectionalLight(0xffffff, 1.2);
+      light.position.set(5, 10, 7); scene.add(light);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      scene.add(new THREE.GridHelper(20, 20, 0x444444, 0x2a2a2a));
+      
+      dimGroup = new THREE.Group(); 
+      scene.add(dimGroup);
+      
+      window.addEventListener('resize', onWindowResize, false);
+      animate();
+    }
+
+    function resetCamera() { camera.position.set(8, 6, 10); controls.update(); }
+    function onWindowResize() {
+        const container = document.getElementById('canvas-container');
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    // --- TEXTURE GENERATOR ---
+    function generateCarving(style) {
+      if(style==='none' || !style) return null;
+      const c = document.createElement('canvas'); c.width=512; c.height=512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle='#808080'; ctx.fillRect(0,0,512,512);
+      ctx.strokeStyle='#404040'; ctx.fillStyle='#404040';
+
+      if(style==='geometric') { ctx.lineWidth=10; for(let i=0;i<512;i+=64) ctx.strokeRect(i,i,512-i*2,512-i*2); }
+      else if(style==='floral') { ctx.lineWidth=5; for(let i=0;i<60;i++) { ctx.beginPath(); ctx.arc(Math.random()*512,Math.random()*512,Math.random()*60,0,Math.PI*2); ctx.stroke(); } }
+      else if(style === 'linear') { ctx.lineWidth = 15; for(let i=0; i<512; i+=40) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke(); } }
+      else if(style === 'lattice') { ctx.lineWidth = 6; const spacing = 60; for(let i=-512; i<1024; i+=spacing) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i+512, 512); ctx.moveTo(i+512, 0); ctx.lineTo(i, 512); ctx.stroke(); } }
+      else if(style === 'studded') { for(let x=20; x<512; x+=60) { for(let y=20; y<512; y+=60) { ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI*2); ctx.fill(); } } }
+      else if(style === 'weave') { const size = 32; for(let y=0; y<512; y+=size) { for(let x=0; x<512; x+=size) { ctx.beginPath(); if ((x/size + y/size) % 2 === 0) { ctx.moveTo(x, y+size/2); ctx.lineTo(x+size, y+size/2); } else { ctx.moveTo(x+size/2, y); ctx.lineTo(x+size/2, y+size); } ctx.lineWidth = 4; ctx.stroke(); } } }
+      else if(style === 'rustic') { ctx.lineWidth = 2; for(let i=0; i<300; i++) { ctx.globalAlpha = Math.random() * 0.5; ctx.beginPath(); const startX = Math.random()*512; const startY = Math.random()*512; ctx.moveTo(startX, startY); ctx.lineTo(startX + (Math.random()-0.5)*100, startY + (Math.random()-0.5)*100); ctx.stroke(); } }
+
+      const tex=new THREE.CanvasTexture(c); tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(2, 2); return tex;
+    }
+
+    function build3DScene() {
+      if(!activeTemplate) return;
+      if(currentGroup) {
+          currentGroup.traverse(mesh => {
+              if (mesh.isMesh && mesh.geometry) mesh.geometry.dispose();
+          });
+          scene.remove(currentGroup);
+      }
+      currentGroup = new THREE.Group();
+
+      const dims = activeTemplate.dims;
+      const SCALE_FACTOR = 50;
+
+      const getDims = (part) => {
+          const d = activeTemplate.dims[part] || { w:50, h:50, d:50 };
+          return { w: Math.max(d.w / SCALE_FACTOR, 0.01), h: Math.max(d.h / SCALE_FACTOR, 0.01), d: Math.max(d.d / SCALE_FACTOR, 0.01) };
+      };
+
+      const createPart = (name, x, y, z, sx=1, sy=1, sz=1) => {
+        const hex = activeTemplate.selections[name];
+        const style = activeTemplate.carvings[name];
+        const shape = activeTemplate.shapes[name];
+        const radius = activeTemplate.radius[name];
+        const d = getDims(name);
+
+        const realW = d.w * sx;
+        const realH = d.h * sy;
+        const realD = d.d * sz;
+
+        let geo;
+        
+        if(shape === 'square' && radius > 0) {
+            const maxR = Math.min(realW/2, realD/2);
+            const r = (radius/100) * maxR; 
+            
+            const shapeObj = new THREE.Shape(); 
+            const hw = realW/2, hd = realD/2;
+
+            shapeObj.moveTo(-hw + r, -hd); 
+            shapeObj.lineTo(hw - r, -hd); 
+            shapeObj.quadraticCurveTo(hw, -hd, hw, -hd + r);
+            shapeObj.lineTo(hw, hd - r); 
+            shapeObj.quadraticCurveTo(hw, hd, hw - r, hd); 
+            shapeObj.lineTo(-hw + r, hd);
+            shapeObj.quadraticCurveTo(-hw, hd, -hw, hd - r); 
+            shapeObj.lineTo(-hw, -hd + r); 
+            shapeObj.quadraticCurveTo(-hw, -hd, -hw + r, -hd);
+            
+            geo = new THREE.ExtrudeGeometry(shapeObj, { depth: realH, bevelEnabled: false, curveSegments: 12 });
+            geo.center(); 
+            geo.rotateX(Math.PI/2);
+        } else if(shape === 'round') { geo = new THREE.CylinderGeometry(realW/2, realW/2, realH, 32); }
+        else if(shape === 'tapered') { geo = new THREE.CylinderGeometry(realW/2*0.6, realW/2, realH, 32); }
+        else { geo = new THREE.BoxGeometry(realW, realH, realD); }
+
+        const carvingTex = generateCarving(style);
+        const mat = new THREE.MeshStandardMaterial({ 
+            color: hex, roughness: 0.7, bumpMap: carvingTex, bumpScale: 0.05 
+        });
+        
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, y, z);
+        mesh.name = name;
+        mesh.geometry.computeBoundingBox();
+        currentGroup.add(mesh);
+      };
+
+      const t = activeTemplate.type;
+      
+      if(t === 'table') {
+        const leg = getDims('Legs'); const top = getDims('Top');
+        const legH = leg.h, topH = top.h;
+        const topShape = activeTemplate.shapes['Top'] || 'square';
+        const legMultiplier = (topShape === 'round' || topShape === 'tapered') ? 0.65 : 1.0;
+
+        createPart('Top', 0, legH + (topH/2), 0);
+        let lx, lz;
+        if(topShape === 'round') { lx = (top.w/2) * legMultiplier; lz = (top.d/2) * legMultiplier; } 
+        else { lx = (top.w/2) - (leg.w/2); lz = (top.d/2) - (leg.d/2); }
+        createPart('Legs', -lx, legH/2, -lz); createPart('Legs', lx, legH/2, -lz);
+        createPart('Legs', -lx, legH/2, lz); createPart('Legs', lx, legH/2, lz);
+      } 
+      else if(t === 'chair') {
+        const l=getDims('Legs'), s=getDims('Seat'), b=getDims('Back');
+        createPart('Seat', 0, l.h+s.h/2, 0); 
+        createPart('Back', 0, l.h+s.h+b.h/2, -(s.d/2)+b.d/2);
+        const lx=(s.w/2)-(l.w/2), lz=(s.d/2)-(l.d/2);
+        createPart('Legs', -lx, l.h/2, -lz); createPart('Legs', lx, l.h/2, -lz); createPart('Legs', -lx, l.h/2, lz); createPart('Legs', lx, l.h/2, lz);
+      }
+      else if(t === 'sofa') {
+        const f=getDims('Frame'), c=getDims('Cushions'), a=getDims('Arms');
+        createPart('Frame', 0, f.h*0.15, 0, 1, 0.3, 1); 
+        createPart('Frame', 0, f.h*0.65, -(f.d/2)+(f.d*0.1), 1, 0.7, 0.2); 
+        const ax=(f.w/2)-(a.w/2);
+        createPart('Arms', -ax, f.h*0.4, 0, 1, 1, 1); createPart('Arms', ax, f.h*0.4, 0, 1, 1, 1);
+        createPart('Cushions', -f.w*0.25, f.h*0.3+c.h/2, 0, 0.45, 1, 0.8); createPart('Cushions', f.w*0.25, f.h*0.3+c.h/2, 0, 0.45, 1, 0.8);
+      }
+      else if(t === 'bed') {
+          const f=getDims('Frame'), h=getDims('Headboard');
+          createPart('Frame', 0, f.h/2, 0);
+          createPart('Headboard', 0, h.h/2, -(f.d/2) - (h.d/2));
+      }
+      else if(t === 'cabinet') {
+          const b=getDims('Body'), d=getDims('Doors');
+          createPart('Body', 0, b.h/2, 0);
+          const dz = (b.d/2)+(d.d/2), dx=b.w/4;
+          createPart('Doors', -dx, b.h/2, dz); createPart('Doors', dx, b.h/2, dz);
+      }
+
+      // UPDATED: Apply scale vector
+      currentGroup.scale.set(activeTemplate.scale.x, activeTemplate.scale.y, activeTemplate.scale.z);
+      scene.add(currentGroup);
+      
+      update3DLabels();
+    }
+
+    function createTransparentTextLabel(message) {
+      const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+      const fontSize = 48; ctx.font = `Bold ${fontSize}px Arial`;
+      const w = ctx.measureText(message).width; 
+      canvas.width = w + 20; canvas.height = fontSize * 1.5; 
+      ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.shadowColor = "rgba(0,0,0,0.8)"; ctx.shadowBlur = 4;
+      ctx.fillText(message, canvas.width/2, canvas.height/2);
+      const texture = new THREE.CanvasTexture(canvas); texture.minFilter = THREE.LinearFilter;
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
+      sprite.scale.set(canvas.width * 0.005, canvas.height * 0.005, 1); 
+      return sprite;
+    }
+
+    function addDimensionLine(start, end, textValue, offsetVec) {
+        const lineStart = start.clone().add(offsetVec); 
+        const lineEnd = end.clone().add(offsetVec);
+        const lineGeo = new THREE.BufferGeometry().setFromPoints([lineStart, lineEnd]);
+        const line = new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 0.6, transparent: true, depthTest: false }));
+        dimGroup.add(line);
+        const label = createTransparentTextLabel(textValue);
+        label.position.copy(new THREE.Vector3().addVectors(lineStart, lineEnd).multiplyScalar(0.5));
+        label.position.add(offsetVec.clone().normalize().multiplyScalar(0.1)); 
+        dimGroup.add(label);
+    }
+
+    function update3DLabels() {
+      dimGroup.clear();
+      if(!activeTemplate) return;
+      const seenParts = new Set(); 
+      currentGroup.children.forEach(mesh => {
+        if (mesh.isMesh && activeTemplate.dims[mesh.name] && !seenParts.has(mesh.name)) {
+          const dims = activeTemplate.dims[mesh.name];
+          const bbox = mesh.geometry.boundingBox;
+          if(bbox) {
+            const min = bbox.min.clone().multiply(mesh.scale).add(mesh.position);
+            const max = bbox.max.clone().multiply(mesh.scale).add(mesh.position);
+            
+            // UPDATED: Use axis specific scale
+            const dispW = Math.round(dims.w * activeTemplate.scale.x);
+            const dispH = Math.round(dims.h * activeTemplate.scale.y);
+            const dispD = Math.round(dims.d * activeTemplate.scale.z);
+            
+            const offset = 0.2; 
+            addDimensionLine(new THREE.Vector3(min.x, min.y, max.z), new THREE.Vector3(max.x, min.y, max.z), `${dispW}cm`, new THREE.Vector3(0, -offset, offset));
+            addDimensionLine(new THREE.Vector3(min.x, min.y, max.z), new THREE.Vector3(min.x, max.y, max.z), `${dispH}cm`, new THREE.Vector3(-offset, 0, offset));
+            addDimensionLine(new THREE.Vector3(max.x, min.y, min.z), new THREE.Vector3(max.x, min.y, max.z), `${dispD}cm`, new THREE.Vector3(offset, -offset, 0));
+            seenParts.add(mesh.name);
+          }
+        }
+      });
+      dimGroup.position.copy(currentGroup.position);
+      dimGroup.rotation.copy(currentGroup.rotation);
+      dimGroup.scale.copy(currentGroup.scale);
+    }
+
+    function animate() { 
+        animationId = requestAnimationFrame(animate); 
+        controls.update(); 
+        renderer.render(scene, camera); 
+    }
+
+    function exportGIF() {
+        alert("Exporting " + activeTemplate.name + " as GIF...");
+    }
+  </script>
+</body>
+</html>
