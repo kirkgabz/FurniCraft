@@ -1,0 +1,627 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FurniCraft - Shop Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --wood-700: #8B4513;
+      --wood-600: #A0522D;
+      --wood-500: #CD853F;
+      --text-main: #2c3e50;
+      --text-muted: #6c757d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg, var(--wood-700) 0%, var(--wood-600) 50%, var(--wood-500) 100%);
+      color: #fff;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      box-shadow: 0 4px 20px rgba(139, 69, 19, 0.3);
+      position: relative;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="wood" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="%23A0522D"/><path d="M0,10 Q5,8 10,10 T20,10" stroke="%23D2691E" stroke-width="0.5" fill="none"/><path d="M0,15 Q5,13 10,15 T20,15" stroke="%23CD853F" stroke-width="0.3" fill="none"/></pattern></defs><rect width="100" height="100" fill="url(%23wood)"/></svg>');
+      opacity: 0.1;
+      pointer-events: none;
+    }
+    .brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .brand::before {
+      content: '\01F6E0';
+      font-size: 1.8rem;
+    }
+    .header-actions {
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .pill {
+      background: rgba(255,255,255,0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      backdrop-filter: blur(10px);
+    }
+    .btn {
+      background: linear-gradient(135deg, var(--wood-700), var(--wood-500));
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      padding: 0.65rem 1rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+      background: linear-gradient(135deg, var(--wood-600), #D2691E);
+    }
+    .btn.secondary { background: #6c757d; }
+    .btn.success { background: #2d8a44; }
+    .btn.danger { background: #c0392b; }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: var(--wood-700);
+      margin-bottom: 0.8rem;
+    }
+    .page-header p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .card {
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+      border-radius: 20px;
+      padding: 1.4rem;
+      border: 1px solid rgba(139, 69, 19, 0.1);
+      box-shadow: 0 10px 30px rgba(139, 69, 19, 0.1);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 20px 40px rgba(139, 69, 19, 0.15), 0 15px 25px rgba(0, 0, 0, 0.1);
+      border-color: rgba(139, 69, 19, 0.2);
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--wood-700), var(--wood-500));
+      opacity: 0.8;
+    }
+    .card h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--text-main);
+      margin-bottom: 0.7rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .muted { color: var(--text-muted); font-size: 0.95rem; }
+    .toolbar { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 0.8rem 0; }
+    .toolbar input, .toolbar select, textarea {
+      padding: 0.55rem 0.7rem;
+      border: 1px solid #d6d6d6;
+      border-radius: 8px;
+      font-family: inherit;
+      background: #fff;
+    }
+    ul.list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .item {
+      border: 1px solid #ececec;
+      border-radius: 10px;
+      padding: 0.75rem;
+      background: #fafafa;
+      transition: border-color 0.2s ease, transform 0.12s ease;
+    }
+    .item:hover {
+      border-color: #d8c2a6;
+      transform: translateY(-1px);
+    }
+    .item-title { font-weight: 600; margin-bottom: 0.35rem; }
+    .item-meta { font-size: 0.88rem; color: #64748b; margin-bottom: 0.5rem; }
+    .item-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .messages {
+      border: 1px solid #ececec;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 0.7rem;
+      height: 250px;
+      overflow-y: auto;
+      margin-bottom: 0.7rem;
+    }
+    .msg {
+      padding: 0.45rem 0.6rem;
+      border-radius: 8px;
+      margin-bottom: 0.4rem;
+      max-width: 85%;
+      font-size: 0.92rem;
+    }
+    .msg.user { background: #e5e7eb; }
+    .msg.shop { background: #8B4513; color: #fff; margin-left: auto; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .stat {
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+      border: 1px solid rgba(139, 69, 19, 0.12);
+      border-radius: 12px;
+      padding: 0.85rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    .stat .k {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.3rem;
+    }
+    .stat .v {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--wood-700);
+      line-height: 1.1;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        padding: 1rem;
+        font-size: 1.2rem;
+      }
+      .container {
+        padding: 1rem;
+      }
+      .page-header h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">FurniCraft Shop Dashboard</div>
+    <div class="header-actions">
+      <span class="pill" id="welcomeText">Welcome!</span>
+      <button class="btn secondary" onclick="window.location.href='front_page.html'">Home</button>
+      <button class="btn danger" onclick="logoutShop()">Logout</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Shop Owner Dashboard</h1>
+      <p>Manage your shop models, customer commissions, and individual customer conversations.</p>
+    </div>
+
+    <section class="stats-grid">
+      <article class="stat">
+        <div class="k">Imported Models</div>
+        <div class="v" id="statModels">0</div>
+      </article>
+      <article class="stat">
+        <div class="k">Total Commissions</div>
+        <div class="v" id="statCommissions">0</div>
+      </article>
+      <article class="stat">
+        <div class="k">Pending</div>
+        <div class="v" id="statPending">0</div>
+      </article>
+      <article class="stat">
+        <div class="k">Messages</div>
+        <div class="v" id="statMessages">0</div>
+      </article>
+    </section>
+
+    <div class="row">
+      <section class="card">
+        <h2>Import 3D Models</h2>
+        <p class="muted">Upload model files and track imported assets.</p>
+        <div class="toolbar">
+          <input type="file" id="modelFile" accept=".obj,.fbx,.gltf,.glb,.dae,.3ds,.blend">
+          <button class="btn success" onclick="importModel()">Import</button>
+        </div>
+        <ul id="modelsList" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Create Designs</h2>
+        <p class="muted">Use the same design tools available to normal users.</p>
+        <div class="toolbar">
+          <button class="btn" onclick="window.location.href='furniture-builder.html'">Open 3D Builder</button>
+          <button class="btn" onclick="window.location.href='craft.html'">Open Craft Page</button>
+          <button class="btn" onclick="window.location.href='templates.html'">Use Templates</button>
+        </div>
+        <p class="muted">Designs created there can be shared with customers through chat.</p>
+      </section>
+    </div>
+
+    <div class="row">
+      <section class="card">
+        <h2>Customer Commissions</h2>
+        <p class="muted">Review and accept/decline commissions sent by customers.</p>
+        <ul id="commissionsList" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Message Center</h2>
+        <p class="muted">Reply to customers individually by selecting a customer thread.</p>
+        <div class="toolbar">
+          <select id="customerThreadSelect" onchange="changeThread()"></select>
+          <button class="btn secondary" onclick="loadCustomerThreads()">Refresh</button>
+        </div>
+        <div id="messagesBox" class="messages"></div>
+        <div class="toolbar">
+          <input id="replyInput" type="text" placeholder="Type your reply..." style="flex: 1;">
+          <button class="btn" onclick="sendReply()">Send</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    if (sessionStorage.getItem('isLoggedIn') !== 'true' || sessionStorage.getItem('userType') !== 'shop') {
+      window.location.href = 'shop_login.html';
+    }
+
+    const username = sessionStorage.getItem('username') || 'Shop Owner';
+    const welcomeText = document.getElementById('welcomeText');
+    const customerThreadSelect = document.getElementById('customerThreadSelect');
+    const modelsList = document.getElementById('modelsList');
+    const commissionsList = document.getElementById('commissionsList');
+    const messagesBox = document.getElementById('messagesBox');
+    const replyInput = document.getElementById('replyInput');
+    const statModels = document.getElementById('statModels');
+    const statCommissions = document.getElementById('statCommissions');
+    const statPending = document.getElementById('statPending');
+    const statMessages = document.getElementById('statMessages');
+
+    let managedShopId = parseInt(sessionStorage.getItem('managedShopId') || '1', 10);
+    let activeCustomer = '';
+
+    welcomeText.textContent = `Welcome, ${username}`;
+
+    function getModelsKey() {
+      return `shop_models_${managedShopId}`;
+    }
+
+    function getCommissionsKey() {
+      return `projectProposals_shop_${managedShopId}`;
+    }
+
+    function getMessagesKey() {
+      return `chatMessages_shop_${managedShopId}`;
+    }
+
+    function loadModels() {
+      const models = JSON.parse(localStorage.getItem(getModelsKey()) || '[]');
+      modelsList.innerHTML = '';
+      if (!models.length) {
+        modelsList.innerHTML = '<li class="item muted">No imported models yet.</li>';
+        return;
+      }
+      models.forEach(model => {
+        const li = document.createElement('li');
+        li.className = 'item';
+        li.innerHTML = `
+          <div class="item-title">${model.name}</div>
+          <div class="item-meta">${model.type || 'model'} â€¢ ${model.size} â€¢ ${new Date(model.uploadedAt).toLocaleString()}</div>
+        `;
+        modelsList.appendChild(li);
+      });
+    }
+
+    function importModel() {
+      const input = document.getElementById('modelFile');
+      if (!input.files.length) {
+        alert('Select a 3D model file first.');
+        return;
+      }
+      const file = input.files[0];
+      const models = JSON.parse(localStorage.getItem(getModelsKey()) || '[]');
+      models.unshift({
+        id: Date.now(),
+        name: file.name,
+        type: file.type || '3d-model',
+        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+        uploadedAt: new Date().toISOString()
+      });
+      localStorage.setItem(getModelsKey(), JSON.stringify(models));
+      input.value = '';
+      loadModels();
+    }
+    function loadCommissions() {
+      const commissions = JSON.parse(localStorage.getItem(getCommissionsKey()) || '[]');
+      commissionsList.innerHTML = '';
+      if (!commissions.length) {
+        commissionsList.innerHTML = '<li class="item muted">No commissions yet for this shop.</li>';
+        return;
+      }
+      commissions.slice().reverse().forEach((commission, idx) => {
+        const status = commission.status || 'pending';
+        const li = document.createElement('li');
+        li.className = 'item';
+        const statusOptions = [
+          { value: 'pending', label: 'Pending' },
+          { value: 'approved', label: 'Accepted' },
+          { value: 'in_progress', label: 'In Progress' },
+          { value: 'completed', label: 'Completed' },
+          { value: 'declined', label: 'Declined' }
+        ].map(opt => `<option value="${opt.value}" ${status === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
+
+        li.innerHTML = `
+          <div class="item-title">Commission #${commissions.length - idx}</div>
+          <div class="item-meta">Customer: ${commission.customerName || 'Customer'} • Status: ${status}</div>
+          <div class="item-meta">${commission.description || 'No description'}</div>
+          <div class="item-meta">Duration: ${commission.duration || '-'} day(s)</div>
+          <div class="item-actions">
+            <button class="btn success" onclick="updateCommission(${commission.id}, 'approved')">Accept</button>
+            <button class="btn danger" onclick="updateCommission(${commission.id}, 'declined')">Decline</button>
+            <select onchange="updateCommissionStatus(${commission.id}, this.value)">
+              ${statusOptions}
+            </select>
+          </div>
+        `;
+        commissionsList.appendChild(li);
+      });
+    }
+
+    function updateCommission(id, newStatus) {
+      const commissions = JSON.parse(localStorage.getItem(getCommissionsKey()) || '[]');
+      const index = commissions.findIndex(c => c.id === id);
+      if (index === -1) return;
+      commissions[index].status = newStatus;
+      if (newStatus === 'approved') {
+        commissions[index].approvedAt = new Date().toISOString();
+      }
+      if (newStatus === 'declined') {
+        commissions[index].declinedAt = new Date().toISOString();
+      }
+      if (newStatus === 'completed') {
+        commissions[index].completedAt = new Date().toISOString();
+      }
+      localStorage.setItem(getCommissionsKey(), JSON.stringify(commissions));
+      loadCommissions();
+      updateStats();
+    }
+
+    function updateCommissionStatus(id, newStatus) {
+      const commissions = JSON.parse(localStorage.getItem(getCommissionsKey()) || '[]');
+      const index = commissions.findIndex(c => c.id === id);
+      if (index === -1) return;
+      commissions[index].status = newStatus;
+      if (newStatus === 'approved') {
+        commissions[index].approvedAt = new Date().toISOString();
+      }
+      if (newStatus === 'declined') {
+        commissions[index].declinedAt = new Date().toISOString();
+      }
+      if (newStatus === 'completed') {
+        commissions[index].completedAt = new Date().toISOString();
+      }
+      localStorage.setItem(getCommissionsKey(), JSON.stringify(commissions));
+      loadCommissions();
+      updateStats();
+    }
+    function loadCustomerThreads() {
+      const messages = JSON.parse(localStorage.getItem(getMessagesKey()) || '[]');
+      const commissions = JSON.parse(localStorage.getItem(getCommissionsKey()) || '[]');
+      const names = new Set();
+
+      messages.forEach(msg => {
+        if (msg.customerName) names.add(msg.customerName);
+      });
+      commissions.forEach(c => {
+        if (c.customerName) names.add(c.customerName);
+      });
+
+      const customers = Array.from(names).sort((a, b) => a.localeCompare(b));
+      customerThreadSelect.innerHTML = '';
+
+      if (!customers.length) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'No customer threads yet';
+        customerThreadSelect.appendChild(option);
+        activeCustomer = '';
+        loadMessages();
+        return;
+      }
+
+      customers.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        customerThreadSelect.appendChild(option);
+      });
+
+      if (!activeCustomer || !customers.includes(activeCustomer)) {
+        activeCustomer = customers[0];
+      }
+      customerThreadSelect.value = activeCustomer;
+      loadMessages();
+    }
+
+    function changeThread() {
+      activeCustomer = customerThreadSelect.value;
+      loadMessages();
+    }
+
+    function loadMessages() {
+      const allMessages = JSON.parse(localStorage.getItem(getMessagesKey()) || '[]');
+      messagesBox.innerHTML = '';
+      if (!activeCustomer) {
+        messagesBox.innerHTML = '<div class="muted">No customer thread selected.</div>';
+        return;
+      }
+
+      const threadMessages = allMessages.filter(msg => (msg.customerName || '') === activeCustomer);
+      if (!threadMessages.length) {
+        messagesBox.innerHTML = `<div class="muted">No messages yet for ${activeCustomer}.</div>`;
+        return;
+      }
+
+      threadMessages.forEach(msg => {
+        const div = document.createElement('div');
+        const sender = msg.sender === 'shop' ? 'shop' : 'user';
+        div.className = `msg ${sender}`;
+        div.textContent = msg.text || '[File/Attachment]';
+        messagesBox.appendChild(div);
+      });
+      messagesBox.scrollTop = messagesBox.scrollHeight;
+    }
+
+    function sendReply() {
+      const text = replyInput.value.trim();
+      if (!text || !activeCustomer) return;
+      const messages = JSON.parse(localStorage.getItem(getMessagesKey()) || '[]');
+      messages.push({
+        id: Date.now(),
+        sender: 'shop',
+        customerName: activeCustomer,
+        text,
+        timestamp: new Date().toISOString(),
+        file: null
+      });
+      localStorage.setItem(getMessagesKey(), JSON.stringify(messages));
+      replyInput.value = '';
+      loadMessages();
+      updateStats();
+    }
+
+    function logoutShop() {
+      sessionStorage.clear();
+      window.location.href = 'shop_login.html';
+    }
+    function loadAll() {
+      seedExampleCommissionsIfEmpty();
+      loadModels();
+      loadCommissions();
+      loadCustomerThreads();
+      updateStats();
+    }
+
+    function seedExampleCommissionsIfEmpty() {
+      const key = getCommissionsKey();
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      if (existing.length) return;
+      const now = Date.now();
+      const examples = [
+        {
+          id: now - 3,
+          customerName: 'Juan Dela Cruz',
+          description: 'Custom narra dining table for 6 with matte finish and tapered legs.',
+          duration: 14,
+          fileData: null,
+          status: 'pending',
+          submittedAt: new Date(now - 86400000).toISOString(),
+          approvedAt: null,
+          declinedAt: null
+        },
+        {
+          id: now - 2,
+          customerName: 'Maria Santos',
+          description: 'Bookshelf restoration and resizing for condo space.',
+          duration: 7,
+          fileData: null,
+          status: 'approved',
+          submittedAt: new Date(now - 172800000).toISOString(),
+          approvedAt: new Date(now - 86400000).toISOString(),
+          declinedAt: null
+        },
+        {
+          id: now - 1,
+          customerName: 'Alex Rivera',
+          description: 'Office desk with cable management and 3 drawers.',
+          duration: 10,
+          fileData: null,
+          status: 'in_progress',
+          submittedAt: new Date(now - 259200000).toISOString(),
+          approvedAt: new Date(now - 172800000).toISOString(),
+          declinedAt: null
+        }
+      ];
+      localStorage.setItem(key, JSON.stringify(examples));
+    }
+    function updateStats() {
+      const models = JSON.parse(localStorage.getItem(getModelsKey()) || '[]');
+      const commissions = JSON.parse(localStorage.getItem(getCommissionsKey()) || '[]');
+      const messages = JSON.parse(localStorage.getItem(getMessagesKey()) || '[]');
+      const pending = commissions.filter(c => (c.status || 'pending') === 'pending').length;
+      statModels.textContent = String(models.length);
+      statCommissions.textContent = String(commissions.length);
+      statPending.textContent = String(pending);
+      statMessages.textContent = String(messages.length);
+    }
+
+    loadAll();
+  </script>
+</body>
+</html>
+
+
+

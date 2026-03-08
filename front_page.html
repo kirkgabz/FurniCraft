@@ -176,6 +176,28 @@
             color: #FFF;
         }
 
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .cta-button.secondary {
+            background: linear-gradient(145deg, #8B4513 0%, #A0522D 100%);
+        }
+
+        .cta-button.secondary:hover {
+            background: linear-gradient(145deg, #A0522D 0%, #8B4513 100%);
+        }
+
+        .cta-button.admin {
+            background: linear-gradient(145deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        .cta-button.admin:hover {
+            background: linear-gradient(145deg, #34495e 0%, #2c3e50 100%);
+        }
+
         footer {
             background: linear-gradient(to top, rgba(62, 39, 35, 0.95), rgba(93, 64, 55, 0.9));
             color: var(--text-beige);
@@ -256,7 +278,11 @@
             <section class="hero-content hero">
                 <h2>Design Your Dream Furniture</h2>
                 <p>FurniCraft is your ultimate platform for creating custom furniture pieces. From rustic chairs to modern desks, bring your ideas to life with our intuitive design tools. Experience the art of woodworking digitally.</p>
-                <a href="login.html" class="cta-button">Get Started <i class="fas fa-arrow-right"></i></a>
+                <div class="cta-buttons">
+                    <a href="login.html" class="cta-button">Get Started <i class="fas fa-arrow-right"></i></a>
+                    <a href="shop_login.html" class="cta-button secondary">Shop Owner Login <i class="fas fa-store"></i></a>
+                    <a href="admin_login.html" class="cta-button admin">Admin Login <i class="fas fa-crown"></i></a>
+                </div>
             </section>
         </div>
     </div>

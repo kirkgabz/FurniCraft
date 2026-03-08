@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Processing | FurniCraft</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #121212;
+            --panel: #1e1e1e;
+            --accent: #27ae60;
+            --text: #e0e0e0;
+            --border: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar Info */
+        .order-summary {
+            width: 350px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .design-preview {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+            border: 1px solid var(--border);
+        }
+
+        /* Chat Area */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #151515;
+        }
+
+        .chat-header {
+            padding: 15px 25px;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .msg {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .msg.shop {
+            background: #2c2c2c;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .msg.user {
+            background: var(--accent);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: var(--panel);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            background: #000;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-send { background: var(--accent); color: white; }
+        .btn-back { background: #333; color: white; text-decoration: none; display: inline-block; text-align: center;}
+        
+        .status-tag {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            background: #f39c12;
+            color: black;
+        }
+
+        .typing { font-size: 0.8rem; color: #777; margin-bottom: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+    <aside class="order-summary">
+        <h2>Order Details</h2>
+        <div class="design-preview" id="preview-box">
+            <i class="fas fa-cube fa-4x"></i>
+        </div>
+        <div id="details">
+            <p style="color:#888; font-size:0.8rem;">ITEM NAME</p>
+            <h3 id="item-name">Loading...</h3>
+            <br>
+            <p style="color:#888; font-size:0.8rem;">ESTIMATED QUOTE</p>
+            <h3 id="item-price" style="color:var(--accent)">₱0.00</h3>
+            <br>
+            <p style="color:#888; font-size:0.8rem;">SHOP</p>
+            <p id="shop-name">Selected Shop</p>
+        </div>
+        
+        <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
+            <a href="main.html" class="btn-back" onclick="updateStatus('Processing')">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </aside>
+
+    <main class="chat-container">
+        <div class="chat-header">
+            <div>
+                <strong id="header-shop-name">Shop Name</strong>
+                <div style="font-size: 0.75rem; color: #2ecc71;"><i class="fas fa-circle"></i> Online</div>
+            </div>
+            <div class="status-tag" id="order-status">Pending Inquiry</div>
+        </div>
+
+        <div class="chat-messages" id="chat-box">
+            </div>
+        
+        <div class="typing" id="typing-indicator">Shop is typing...</div>
+
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Ask about materials, delivery time...">
+            <button class="btn-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </main>
+
+    <script>
+        let orderData = null;
+
+        window.onload = () => {
+            // Get data from Editor
+            const rawData = localStorage.getItem('currentActiveOrder');
+            if(!rawData) {
+                alert("No active order found. Please design something first!");
+                window.location.href = 'index.html';
+                return;
+            }
+            orderData = JSON.parse(rawData);
+
+            // Fill UI
+            document.getElementById('item-name').innerText = orderData.itemName;
+            document.getElementById('item-price').innerText = orderData.price;
+            document.getElementById('shop-name').innerText = orderData.shopName;
+            document.getElementById('header-shop-name').innerText = orderData.shopName;
+
+            // Start Conversation
+            startSequence();
+        };
+
+        function addMessage(text, sender) {
+            const box = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            div.className = `msg ${sender}`;
+            div.innerText = text;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function startSequence() {
+            const shop = orderData.shopName;
+            
+            await wait(1000);
+            addMessage(`Hello! We received your design for the "${orderData.itemName}". Let us review the specifications.`, 'shop');
+            
+            await wait(2500);
+            showTyping(true);
+            await wait(2000);
+            showTyping(false);
+            addMessage(`The dimensions look solid. Based on the 1:12 scale, we can use premium Philippine Mahogany for this. Does that work for you?`, 'shop');
+            
+            // Update status in storage
+            updateStatus('Discussing');
+        }
+
+        function showTyping(show) {
+            document.getElementById('typing-indicator').style.display = show ? 'block' : 'none';
+        }
+
+        function wait(ms) { return new Promise(res => setTimeout(res, ms)); }
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            if(!input.value.trim()) return;
+
+            addMessage(input.value, 'user');
+            const query = input.value.toLowerCase();
+            input.value = '';
+
+            // Simple Auto-Response
+            setTimeout(async () => {
+                showTyping(true);
+                await wait(2000);
+                showTyping(false);
+                
+                if(query.includes('price') || query.includes('how much')) {
+                    addMessage(`The estimate of ${orderData.price} includes the labor and materials. Shipping would be extra depending on your location.`, 'shop');
+                } else {
+                    addMessage("I'll check with our head carpenter and get back to you on that!", 'shop');
+                }
+            }, 1000);
+        }
+
+        function updateStatus(newStatus) {
+            orderData.status = newStatus;
+            document.getElementById('order-status').innerText = newStatus;
+            
+            // Sync back to the main list
+            let orders = JSON.parse(localStorage.getItem('myOrders') || '[]');
+            const index = orders.findIndex(o => o.id === orderData.id);
+            if(index !== -1) {
+                orders[index].status = newStatus;
+                localStorage.setItem('myOrders', JSON.stringify(orders));
+            }
+            localStorage.setItem('currentActiveOrder', JSON.stringify(orderData));
+        }
+    </script>
+</body>
+</html>

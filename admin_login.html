@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - FurniCraft</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    /* --- RESET & BASIC SETUP --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 25%, #7f8c8d 50%, #95a5a6 75%, #bdc3c7 100%);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      position: relative;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* --- PARTICLES --- */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .particle:nth-child(odd) {
+      animation-delay: -3s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+      50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+    }
+
+    /* --- LOGIN CARD --- */
+    .login-box {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 450px;
+      position: relative;
+      z-index: 10;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-header i {
+      font-size: 3rem;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    .login-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
+
+    .error-msg {
+      background: #e74c3c;
+      color: white;
+      padding: 0.8rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      text-align: center;
+      display: none;
+      font-size: 0.9rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      border: 2px solid #ecf0f1;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #2c3e50;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+      background: white;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7f8c8d;
+      font-size: 1.1rem;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(44, 62, 80, 0.3);
+      background: linear-gradient(135deg, #34495e, #2c3e50);
+    }
+
+    .action-btn:active {
+      transform: translateY(0);
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    .links a {
+      color: #2c3e50;
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin: 0 1rem;
+      transition: color 0.3s ease;
+    }
+
+    .links a:hover {
+      color: #34495e;
+      text-decoration: underline;
+    }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 480px) {
+      .login-box {
+        margin: 1rem;
+        padding: 2rem;
+      }
+
+      .login-header h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Particles Background -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Login Form -->
+  <div class="login-box">
+    <div class="login-header">
+      <i class="fas fa-crown"></i>
+      <h1>Admin Login</h1>
+      <p>Access the FurniCraft administration panel</p>
+    </div>
+
+    <div class="error-msg" id="loginError">
+      Invalid admin credentials. Access denied.
+    </div>
+
+    <form id="adminLoginForm">
+      <div class="input-group">
+        <i class="fas fa-user-shield"></i>
+        <input type="text" id="adminUsername" placeholder="Admin Username" required>
+      </div>
+
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="adminPassword" placeholder="Admin Password" required>
+      </div>
+
+      <button type="submit" class="action-btn">
+        <i class="fas fa-sign-in-alt"></i> Login to Admin Panel
+      </button>
+    </form>
+
+    <div class="links">
+      <a href="front_page.html"><i class="fas fa-home"></i> Back to Home</a>
+      <a href="login.html"><i class="fas fa-user"></i> Customer Login</a>
+    </div>
+  </div>
+
+  <script>
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 6 + 's';
+        particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    createParticles();
+
+    /* --- ADMIN LOGIN LOGIC --- */
+    const adminLoginForm = document.getElementById('adminLoginForm');
+    const loginError = document.getElementById('loginError');
+
+    adminLoginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById('adminUsername').value.trim();
+      const password = document.getElementById('adminPassword').value;
+
+      // Demo admin credentials
+      if (username === "admin" && password === "admin123") {
+        // Store admin login info
+        sessionStorage.setItem('userType', 'admin');
+        sessionStorage.setItem('adminUsername', username);
+        sessionStorage.setItem('username', 'Administrator');
+
+        // Redirect to admin dashboard
+        window.location.href = "admin.html";
+      } else {
+        loginError.style.display = 'block';
+        // Hide error after 3 seconds
+        setTimeout(() => {
+          loginError.style.display = 'none';
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FurniCraft - Shop Partner Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --wood-700: #8B4513;
+      --wood-600: #A0522D;
+      --wood-500: #CD853F;
+      --text-main: #2c3e50;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f4f1ee;
+      background-image: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), 
+                        url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+    }
+
+    .login-card {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      border-top: 5px solid var(--wood-700);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--wood-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: var(--text-main);
+    }
+
+    input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--wood-500);
+    }
+
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, var(--wood-700), var(--wood-500));
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 1rem;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+    }
+
+    .footer-links {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    .footer-links a {
+      color: var(--wood-600);
+      text-decoration: none;
+    }
+
+    .error-msg {
+      color: #c0392b;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <div class="login-header">
+      <h1>FurniCraft</h1>
+      <p>Partner Dashboard Login</p>
+    </div>
+
+    <div id="errorBox" class="error-msg">Invalid credentials. Please try again.</div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Shop Username</label>
+        <input type="text" id="username" placeholder="Enter shop name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="btn-login">Access Dashboard</button>
+    </form>
+
+    <div class="footer-links">
+      <a href="front_page.html">← Back to Main Website</a>
+    </div>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const errorBox = document.getElementById('errorBox');
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+
+      // Simple Logic for Demo: 
+      // In a real app, this would be an API call to your server.
+      if (user.toLowerCase() === "artisan" && pass === "password123") {
+        
+        // Setting up the session expected by your dashboard
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userType', 'shop');
+        sessionStorage.setItem('username', 'Artisan Woodworks');
+        sessionStorage.setItem('managedShopId', '101'); // Unique ID for this shop
+        
+        // Redirect to your dashboard file
+        // Ensure the filename here matches your dashboard HTML file
+        window.location.href = 'shop_dashboard.html'; 
+        
+      } else {
+        errorBox.style.display = 'block';
+      }
+    });
+  </script>
+
+</body>
+</html>

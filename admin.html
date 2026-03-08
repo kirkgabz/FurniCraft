@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - FurniCraft</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      min-height: 100vh;
+      color: #2c3e50;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #7f8c8d 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(44, 62, 80, 0.3);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-left h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+    }
+
+    .header-left i {
+      font-size: 2rem;
+      color: #3498db;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    #adminUser {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    /* Main Content */
+    main {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .dashboard-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .dashboard-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    .dashboard-header p {
+      color: #6c757d;
+      font-size: 1.1rem;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-card i {
+      font-size: 3rem;
+      color: #3498db;
+      margin-bottom: 1rem;
+    }
+
+    .stat-card h3 {
+      font-size: 2rem;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-card p {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+
+    /* Management Sections */
+    .management-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+
+    .management-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .management-card h2 {
+      font-family: 'Playfair Display', serif;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .management-card h2 i {
+      color: #3498db;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .action-btn {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .action-btn.danger {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+    }
+
+    .action-btn.danger:hover {
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .action-btn.success {
+      background: linear-gradient(135deg, #27ae60, #229954);
+    }
+
+    .action-btn.success:hover {
+      box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    }
+
+    /* Recent Activity */
+    .activity-section {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-top: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .activity-section h2 {
+      font-family: 'Playfair Display', serif;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .activity-list {
+      list-style: none;
+    }
+
+    .activity-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid #ecf0f1;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-item i {
+      color: #3498db;
+      font-size: 1.2rem;
+    }
+
+    .activity-item .content {
+      flex: 1;
+    }
+
+    .activity-item .content strong {
+      color: #2c3e50;
+    }
+
+    .activity-item .time {
+      color: #6c757d;
+      font-size: 0.8rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .management-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <i class="fas fa-crown"></i>
+      <h1>FurniCraft Admin</h1>
+    </div>
+    <div class="header-right">
+      <div id="adminUser">Welcome, Administrator!</div>
+      <button class="logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="dashboard-header">
+      <h1>Administration Dashboard</h1>
+      <p>Manage users, shops, and system operations</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <i class="fas fa-users"></i>
+        <h3 id="totalUsers">1,247</h3>
+        <p>Total Users</p>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-store"></i>
+        <h3 id="totalShops">89</h3>
+        <p>Active Shops</p>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-shopping-cart"></i>
+        <h3 id="totalOrders">3,456</h3>
+        <p>Total Orders</p>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-dollar-sign"></i>
+        <h3 id="totalRevenue">$127,890</h3>
+        <p>Revenue</p>
+      </div>
+    </div>
+
+    <!-- Management Sections -->
+    <div class="management-grid">
+      <!-- User Management -->
+      <div class="management-card">
+        <h2><i class="fas fa-user-cog"></i> User Management</h2>
+        <div class="action-buttons">
+          <button class="action-btn" onclick="manageUsers()">
+            <i class="fas fa-list"></i> View All Users
+          </button>
+          <button class="action-btn success" onclick="addUser()">
+            <i class="fas fa-plus"></i> Add User
+          </button>
+          <button class="action-btn danger" onclick="banUser()">
+            <i class="fas fa-ban"></i> Ban User
+          </button>
+          <button class="action-btn" onclick="userReports()">
+            <i class="fas fa-chart-bar"></i> User Reports
+          </button>
+        </div>
+      </div>
+
+      <!-- Shop Management -->
+      <div class="management-card">
+        <h2><i class="fas fa-store-alt"></i> Shop Management</h2>
+        <div class="action-buttons">
+          <button class="action-btn" onclick="manageShops()">
+            <i class="fas fa-list"></i> View All Shops
+          </button>
+          <button class="action-btn success" onclick="approveShop()">
+            <i class="fas fa-check"></i> Approve Shop
+          </button>
+          <button class="action-btn danger" onclick="suspendShop()">
+            <i class="fas fa-pause"></i> Suspend Shop
+          </button>
+          <button class="action-btn" onclick="shopAnalytics()">
+            <i class="fas fa-chart-line"></i> Shop Analytics
+          </button>
+        </div>
+      </div>
+
+      <!-- Content Management -->
+      <div class="management-card">
+        <h2><i class="fas fa-edit"></i> Content Management</h2>
+        <div class="action-buttons">
+          <button class="action-btn" onclick="manageTemplates()">
+            <i class="fas fa-file-alt"></i> Templates
+          </button>
+          <button class="action-btn" onclick="manageCategories()">
+            <i class="fas fa-tags"></i> Categories
+          </button>
+          <button class="action-btn" onclick="featuredContent()">
+            <i class="fas fa-star"></i> Featured
+          </button>
+          <button class="action-btn" onclick="contentReports()">
+            <i class="fas fa-flag"></i> Reports
+          </button>
+        </div>
+      </div>
+
+      <!-- System Management -->
+      <div class="management-card">
+        <h2><i class="fas fa-cogs"></i> System Management</h2>
+        <div class="action-buttons">
+          <button class="action-btn" onclick="systemSettings()">
+            <i class="fas fa-sliders-h"></i> Settings
+          </button>
+          <button class="action-btn" onclick="backupData()">
+            <i class="fas fa-database"></i> Backup
+          </button>
+          <button class="action-btn danger" onclick="systemMaintenance()">
+            <i class="fas fa-tools"></i> Maintenance
+          </button>
+          <button class="action-btn" onclick="systemLogs()">
+            <i class="fas fa-file-text"></i> System Logs
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-section">
+      <h2><i class="fas fa-history"></i> Recent Activity</h2>
+      <ul class="activity-list">
+        <li class="activity-item">
+          <i class="fas fa-user-plus"></i>
+          <div class="content">
+            <strong>New user registered:</strong> john.doe@example.com
+            <div class="time">2 minutes ago</div>
+          </div>
+        </li>
+        <li class="activity-item">
+          <i class="fas fa-store"></i>
+          <div class="content">
+            <strong>Shop approved:</strong> Modern Furnishings Co.
+            <div class="time">15 minutes ago</div>
+          </div>
+        </li>
+        <li class="activity-item">
+          <i class="fas fa-shopping-cart"></i>
+          <div class="content">
+            <strong>New order placed:</strong> Order #12345 - $299.99
+            <div class="time">1 hour ago</div>
+          </div>
+        </li>
+        <li class="activity-item">
+          <i class="fas fa-flag"></i>
+          <div class="content">
+            <strong>Content reported:</strong> Inappropriate template flagged
+            <div class="time">2 hours ago</div>
+          </div>
+        </li>
+        <li class="activity-item">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div class="content">
+            <strong>System alert:</strong> High server load detected
+            <div class="time">3 hours ago</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </main>
+
+  <script>
+    // Check admin authentication
+    const userType = sessionStorage.getItem('userType');
+    const adminUsername = sessionStorage.getItem('adminUsername');
+
+    if (userType !== 'admin' || !adminUsername) {
+      alert('Access denied. Admin authentication required.');
+      window.location.href = 'admin_login.html';
+    }
+
+    // Set admin username
+    if (adminUsername) {
+      document.getElementById('adminUser').textContent = `Welcome, ${adminUsername}!`;
+    }
+
+    // Logout function
+    function logout() {
+      sessionStorage.clear();
+      window.location.href = 'front_page.html';
+    }
+
+    // Admin functions (placeholders with alerts)
+    function manageUsers() {
+      alert('User Management Panel - Feature coming soon!');
+    }
+
+    function addUser() {
+      alert('Add New User - Feature coming soon!');
+    }
+
+    function banUser() {
+      alert('Ban User - Feature coming soon!');
+    }
+
+    function userReports() {
+      alert('User Reports - Feature coming soon!');
+    }
+
+    function manageShops() {
+      alert('Shop Management Panel - Feature coming soon!');
+    }
+
+    function approveShop() {
+      alert('Approve Shop - Feature coming soon!');
+    }
+
+    function suspendShop() {
+      alert('Suspend Shop - Feature coming soon!');
+    }
+
+    function shopAnalytics() {
+      alert('Shop Analytics - Feature coming soon!');
+    }
+
+    function manageTemplates() {
+      alert('Template Management - Feature coming soon!');
+    }
+
+    function manageCategories() {
+      alert('Category Management - Feature coming soon!');
+    }
+
+    function featuredContent() {
+      alert('Featured Content Management - Feature coming soon!');
+    }
+
+    function contentReports() {
+      alert('Content Reports - Feature coming soon!');
+    }
+
+    function systemSettings() {
+      alert('System Settings - Feature coming soon!');
+    }
+
+    function backupData() {
+      alert('Data Backup - Feature coming soon!');
+    }
+
+    function systemMaintenance() {
+      alert('System Maintenance - Feature coming soon!');
+    }
+
+    function systemLogs() {
+      alert('System Logs - Feature coming soon!');
+    }
+
+    // Simulate real-time updates
+    setInterval(() => {
+      // Randomly update stats for demo purposes
+      const users = document.getElementById('totalUsers');
+      const shops = document.getElementById('totalShops');
+      const orders = document.getElementById('totalOrders');
+
+      users.textContent = (1247 + Math.floor(Math.random() * 10)).toLocaleString();
+      shops.textContent = (89 + Math.floor(Math.random() * 5)).toLocaleString();
+      orders.textContent = (3456 + Math.floor(Math.random() * 20)).toLocaleString();
+    }, 30000); // Update every 30 seconds
+  </script>
+</body>
+</html>

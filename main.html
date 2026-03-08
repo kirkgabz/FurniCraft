@@ -440,6 +440,53 @@
     </div>
 
     <div class="furniture-grid">
+      <!-- ================= ORDER DASHBOARD ================= -->
+<section style="margin-top:3rem;">
+
+  <h2 style="
+  font-family:'Playfair Display',serif;
+  color:#8B4513;
+  margin-bottom:1rem;
+  text-align:center;
+  ">
+  Your Orders
+  </h2>
+
+  <!-- Current Orders -->
+  <div style="
+  background:white;
+  border-radius:15px;
+  padding:1.5rem;
+  margin-bottom:1.5rem;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  ">
+
+    <h3 style="margin-bottom:1rem;">Current Orders</h3>
+
+    <div id="currentOrders">
+      No active orders yet.
+    </div>
+
+  </div>
+
+
+  <!-- Transaction History -->
+  <div style="
+  background:white;
+  border-radius:15px;
+  padding:1.5rem;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  ">
+
+    <h3 style="margin-bottom:1rem;">Transaction History</h3>
+
+    <div id="orderHistory">
+      No previous transactions.
+    </div>
+
+  </div>
+
+</section>
       <div class="furniture-card fade-in" onclick="location.href='craft.html'">
         <div class="furniture-image">🛠️</div>
         <h2>Craft a Furniture</h2>
@@ -520,6 +567,66 @@
       const sideHamburger = document.querySelector('.side-hamburger');
       if (!sidePanel.contains(event.target) && !sideHamburger.contains(event.target)) {
         closeSidePanel();
+        function loadOrdersDashboard(){
+
+  const currentBox = document.getElementById("currentOrders")
+  const historyBox = document.getElementById("orderHistory")
+
+  let currentHTML = ""
+  let historyHTML = ""
+
+  Object.keys(localStorage).forEach(key => {
+
+    if(key.startsWith("order_")){
+
+      const order = JSON.parse(localStorage.getItem(key))
+
+      const card = `
+      <div style="
+      border:1px solid #eee;
+      padding:1rem;
+      border-radius:10px;
+      margin-bottom:0.8rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      ">
+      
+        <div>
+          <b>${order.projectName}</b><br>
+          <small>${order.shopName}</small><br>
+          <small>Estimated: ${order.estimated}</small>
+        </div>
+
+        <div style="text-align:right;">
+          <span style="
+          padding:5px 10px;
+          border-radius:20px;
+          font-size:0.8rem;
+          background:${order.status==="successful" ? "#d4edda" : "#ffe7c2"};
+          color:${order.status==="successful" ? "#155724" : "#8B4513"};
+          ">
+          ${order.status}
+          </span>
+        </div>
+
+      </div>
+      `
+
+      if(order.status === "pending"){
+        currentHTML += card
+      }else{
+        historyHTML += card
+      }
+
+    }
+
+  })
+
+  currentBox.innerHTML = currentHTML || "No active orders."
+  historyBox.innerHTML = historyHTML || "No previous transactions."
+
+}
       }
     });
   </script>
